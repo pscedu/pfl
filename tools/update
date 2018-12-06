@@ -64,11 +64,11 @@ scm-fetch:*)
 	repos=($(echo ${1#scm-fetch:} | tr . /))
 	if [ x"$repos" = x"all" ]; then
 		repos=(
-		    distrib.gcrcutil
-		    distrib.iozone
-		    distrib.libs3
-		    distrib.posix-fstest
-		    distrib.spiobench
+		    distrib/gcrcutil
+		    distrib/iozone
+		    distrib/libs3
+		    distrib/posix-fstest
+		    distrib/spiobench
 		    mfio
 		    psync
 		    sft
