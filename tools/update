@@ -62,6 +62,22 @@ repos=( pfl */.git inf/*/.git distrib/*/.git )
 case $1 in
 scm-fetch:*)
 	repos=($(echo ${1#scm-fetch:} | tr . /))
+	if [ x"$repos" = x"all" ]; then
+		repos=(
+		    distrib.gcrcutil
+		    distrib.iozone
+		    distrib.libs3
+		    distrib.posix-fstest
+		    distrib.spiobench
+		    mfio
+		    psync
+		    sft
+		    slash2
+		    src-upd
+		    wokfs
+		    xopctl
+		)
+	fi
 	GIT_ACTION=clone
 	;;
 scm-update)
