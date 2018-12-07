@@ -96,16 +96,17 @@ int
 _psc_waitq_waitabs(struct psc_waitq *q, enum pfl_lockprim type,
     void *lockp, const struct timespec *abstime)
 {
-	int rc;
 	struct psc_thread *thr;
+	int rc;
 
-	thr = pscthr_get();
+	thr = pscthr_get_canfail();
 	psc_mutex_lock(&q->wq_mut);
 	q->wq_nwaiters++;
 
 	PFL_LOCKPRIM_ULOCK(type, lockp);
 
-	thr->pscthr_waitq = q->wq_name;
+	if (thr)
+		thr->pscthr_waitq = q->wq_name;
 	if (abstime) {
 		rc = pthread_cond_timedwait(&q->wq_cond,
 		    &q->wq_mut.pm_mutex, abstime);
@@ -122,7 +123,8 @@ _psc_waitq_waitabs(struct psc_waitq *q, enum pfl_lockprim type,
 			    strerror(rc));
 	}
 
-	thr->pscthr_waitq = NULL;
+	if (thr)
+		thr->pscthr_waitq = NULL;
 	q->wq_nwaiters--;
 	psc_mutex_unlock(&q->wq_mut);
 
@@ -196,7 +198,7 @@ int
 _psc_waitq_waitrel(__unusedx struct psc_waitq *q,
     __unusedx enum pfl_lockprim type, __unusedx void *lockp,
     __unusedx long s, __unusedx long ns)
-{
+{	
 	psc_fatalx("wait will sleep forever, single threaded");
 }
 

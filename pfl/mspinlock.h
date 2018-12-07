@@ -36,10 +36,10 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "pfl/vbitmap.h"
 #include "pfl/atomic.h"
 #include "pfl/lock.h"
 #include "pfl/log.h"
+#include "pfl/vbitmap.h"
 #include "pfl/thread.h"
 
 struct psc_mspinlock {
@@ -49,8 +49,8 @@ struct psc_mspinlock {
 #endif
 };
 
-#define PMSL_LOCKMASK	(1 << 15)	/* 10000000_00000000 */
-#define PMSL_OWNERMASK	(0x7fff)	/* 01111111_11111111 */
+#define PMSL_LOCKMASK	(1U << 15)		/* 10000000_00000000 */
+#define PMSL_OWNERMASK	(0x7fff)		/* 01111111_11111111 */
 
 #ifdef PMSL_MAGIC
 # define PMSL_MAGICVAL	0x43218765

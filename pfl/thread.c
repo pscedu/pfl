@@ -62,10 +62,10 @@ struct psc_lockedlist		 psc_threads =
  * The following does not affect ZFS-fuse threads.
  */
 #define	PTHREAD_GUARD_SIZE	 4096
-#define	PTHREAD_STACK_SIZE	 8*1024*1024
+#define	PTHREAD_STACK_SIZE	 (8 * 1024 * 1024)
 
 __static pthread_attr_t		 pthread_attr;
-__static psc_spinlock_t	  	 pthread_lock;
+__static psc_spinlock_t		 pthread_lock;
 __static struct psc_waitq	 pthread_waitq;
 
 /*
@@ -230,10 +230,10 @@ _pscthr_finish_init(struct psc_thread_init *thr_init)
 	 * Do this allocation now instead during fatal() if malloc is
 	 * corrupted.
 	 */
-	thr->pscthr_callerinfo = psc_alloc(sizeof(struct pfl_callerinfo), 
+	thr->pscthr_callerinfo = psc_alloc(sizeof(struct pfl_callerinfo),
 	    PAF_NOLOG);
 
-	/* 
+	/*
 	 * See psc_ctlmsg_thread_send() on how to return thread
 	 * formation via command like msctl -s threads.
 	 */
@@ -306,8 +306,8 @@ _pscthr_begin(void *arg)
  * Initialize a thread.
  * @type: application-specific thread type.
  * @startf: thread execution routine.  By specifying a NULL routine, no
- * pthread will be spawned (assuming that an actual pthread already
- * exists or will be taken care of).
+ *	pthread will be spawned (assuming that an actual pthread already
+ *	exists or will be taken care of).
  * @privsiz: size of thread-type-specific data.
  * @memnid: memory node ID to allocate memory for this thread.
  * @namefmt: application-specific printf(3) name for thread.
@@ -345,7 +345,7 @@ _pscthr_init(int type, void (*startf)(struct psc_thread *),
 	/* Pin thread until initialization is complete. */
 	spinlock(&pthread_lock);
 	if (startf) {
-		rc = pthread_create(&thr->pscthr_pthread, &pthread_attr, 
+		rc = pthread_create(&thr->pscthr_pthread, &pthread_attr,
 		    _pscthr_begin, &thr_init);
 		if (rc)
 			psc_fatalx("pthread_create: %s", strerror(rc));
@@ -467,8 +467,7 @@ pscthr_run(struct psc_thread *thr)
 	if ((thr->pscthr_flags & PTF_RUN) == 0) {
 		spinlock(&pthread_lock);
 		while ((thr->pscthr_flags & PTF_RUN) == 0) {
-			psc_waitq_wait(&pthread_waitq,
-			    &pthread_lock);
+			psc_waitq_wait(&pthread_waitq, &pthread_lock);
 			spinlock(&pthread_lock);
 		}
 		freelock(&pthread_lock);
