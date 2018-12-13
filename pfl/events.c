@@ -91,7 +91,7 @@ int64_t pfl_rpc_service_reply_latency_durations[] = {
 void
 pscrpc_request_out_callback(lnet_event_t *ev)
 {
-	int silent;
+	int silent = 0;
 	char buf[PSCRPC_NIDSTR_SIZE];
 	struct pscrpc_cb_id   *cbid = ev->md.user_ptr;
 	struct pscrpc_request *req = cbid->cbid_arg;

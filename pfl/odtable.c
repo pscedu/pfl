@@ -456,7 +456,7 @@ pfl_odt_check(struct pfl_odt *t,
 		pfl_odt_getslot(t, i, &p, &f);
 
 		if (f->odtf_slotno != i)
-			PFLOG_ODT(PLL_FATAL, t, "footercheck: i = %lu", i);
+			PFLOG_ODT(PLL_FATAL, t, "footercheck: i=%"PRIu64, i);
 
 		if (h->odth_options & ODTBL_OPT_CRC) {
 			psc_crc64_init(&crc);

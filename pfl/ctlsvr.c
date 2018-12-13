@@ -1361,7 +1361,7 @@ psc_ctlparam_pool_handle(int fd, struct psc_ctlmsghdr *mh,
 			return (psc_ctlsenderr(fd, mh, NULL,
 			    "pool.%s.grows: read-only", levels[1]));
 		levels[2] = "grows";
-		snprintf(nbuf, sizeof(nbuf), "%zd",
+		snprintf(nbuf, sizeof(nbuf), "%"PRIu64,
 		    psc_atomic64_read(&m->ppm_opst_grows->opst_lifetime));
 		if (!psc_ctlmsg_param_send(fd, mh, pcp,
 		    PCTHRNAME_EVERYONE, levels, 3, nbuf))

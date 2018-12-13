@@ -52,8 +52,7 @@ size_t			 item_size = ODT_ITEM_SIZE;
 size_t			 nitems = ODT_ITEM_COUNT;
 
 void
-visit(__unusedx void *data, int64_t item,
-    void *arg)
+visit(__unusedx void *data, int64_t item, void *arg)
 {
 	char buf[LINE_MAX], *p = data;
 	struct pfl_odt **t = arg;
@@ -78,7 +77,7 @@ visit(__unusedx void *data, int64_t item,
 		dump_hdr = 1;
 	}
 
-	printf("item: %7zd", item);
+	printf("item: %7"PRId64, item);
 
 	if (fmt) {
 		(void)FMTSTR(buf, sizeof(buf), fmt,
