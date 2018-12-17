@@ -37,10 +37,6 @@
 # include "compat/vis.h"
 #endif
 
-#ifndef HAVE_STRNVIS
-# include "compat/strnvis.h"
-#endif
-
 struct pfl_strbuf {
 	int	 psb_pos;
 	int	 psb_max;
@@ -70,6 +66,8 @@ char	*pfl_strrastr(const char *, char, size_t);
 size_t	 pfl_string_eqlen(const char *, const char *);
 
 int	 pfl_memchk(const void *, int, size_t);
+
+int	 pfl_strnvis(char *, const char *, size_t, int);
 
 uint64_t _psc_str_hashify(const void *, size_t);
 

@@ -44,6 +44,7 @@ SRCS+=		${PFL_BASE}/rlimit.c
 SRCS+=		${PFL_BASE}/setprocesstitle.c
 SRCS+=		${PFL_BASE}/str.c
 SRCS+=		${PFL_BASE}/stree.c
+SRCS+=		${PFL_BASE}/strnvis.c
 SRCS+=		${PFL_BASE}/subsys.c
 SRCS+=		${PFL_BASE}/sys.c
 SRCS+=		${PFL_BASE}/thread.c
