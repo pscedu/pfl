@@ -69,6 +69,8 @@ scm-fetch:*)
 		    distrib/libs3
 		    distrib/posix-fstest
 		    distrib/spiobench
+		    adaptfs
+		    jives
 		    mfio
 		    psync
 		    sft
