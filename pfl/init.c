@@ -39,7 +39,6 @@
 #include "pfl/lock.h"
 #include "pfl/log.h"
 #include "pfl/pfl.h"
-#include "pfl/rpc.h"
 #include "pfl/thread.h"
 #include "pfl/time.h"
 
@@ -53,7 +52,6 @@ struct timespec				  pfl_uptime;
 /* no functional usage, used to debug lease expiration time */
 time_t				  	  pfl_start_time;
 
-/* XXX does not work on FreeBSD 9.0, it returns -1 */
 pid_t
 pfl_getsysthrid(void)
 {
@@ -64,7 +62,12 @@ pfl_getsysthrid(void)
 #elif defined(SYS_getthrid)
 	return (syscall(SYS_getthrid));
 #elif defined(SYS_thr_self)
-	return (syscall(SYS_thr_self));
+	long id;
+	int rc;
+
+	rc = thr_self(&id);
+	psc_assert(rc == 0);
+	return (id);
 #elif defined(HAVE_LIBPTHREAD)
 	return (pthread_self());
 #else
