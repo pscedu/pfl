@@ -29,9 +29,9 @@
 #include <unistd.h>
 
 #include "pfl/cdefs.h"
-#include "pfl/pfl.h"
 #include "pfl/dynarray.h"
 #include "pfl/log.h"
+#include "pfl/pfl.h"
 
 __dead void
 usage(void)
@@ -66,7 +66,7 @@ display(struct psc_dynarray *da)
 #define CHECK(d, ...)	_check(PFL_CALLERINFO(), (d), ##__VA_ARGS__)
 
 void
-_check(const struct pfl_callerinfo *pci, struct psc_dynarray *da, ...)
+_check(PFL_CALLERINFO_ARG, struct psc_dynarray *da, ...)
 {
 	void *p, *t, *checkp;
 	va_list ap, c;
