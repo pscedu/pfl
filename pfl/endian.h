@@ -35,6 +35,8 @@
 # define PFL_BYTE_ORDER _BYTE_ORDER
 #elif defined(__BYTE_ORDER)
 # define PFL_BYTE_ORDER __BYTE_ORDER
+#elif defined(BYTE_ORDER)
+# define PFL_BYTE_ORDER BYTE_ORDER
 #else
 # error BYTE_ORDER unavailable
 #endif
