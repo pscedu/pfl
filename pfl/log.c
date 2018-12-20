@@ -84,12 +84,12 @@ int				 psc_loglevel = PLL_NOTICE;
 __static struct psclog_data	*psc_logdata;
 char				 psclog_eol[8] = "\n";	/* overrideable with ncurses EOL */
 
-char		 		 psc_hostshort[64];
-char		 		 psc_hostname[64];
+char				 psc_hostshort[MAXHOSTNAMELEN];
+char				 psc_hostname[MAXHOSTNAMELEN];
 
 psc_spinlock_t			 psc_stack_lock = SPINLOCK_INIT;
 void				*psc_stack_ptrbuf[32];
-char		 		 psc_stack_symbuf[256];
+char				 psc_stack_symbuf[256];
 
 /*
  * A user can define one or more PSC_SYSLOG_$subsys environment
@@ -116,7 +116,7 @@ struct psc_hashtbl		_pfl_logpoints_hashtbl;
 static int log_cycle_count;
 static int log_rotate_count;
 int pfl_log_rotate = PSC_MAX_LOG_PER_FILE;
- 
+
 static char *loglk;
 static char  logfn[PATH_MAX];
 
@@ -133,7 +133,7 @@ void psc_should_rotate_log(void)
 		return;
 
 	log_rotate_count = 0;
-	rc = snprintf(newfn, sizeof(newfn), "%s-%d", 
+	rc = snprintf(newfn, sizeof(newfn), "%s-%d",
 	    logfn, log_cycle_count++);
 	if (rc < 0) {
 		warn("log snprintf rc = %d", rc);
@@ -156,7 +156,7 @@ void psc_should_rotate_log(void)
 		return;
 	}
 	if (loglk) {
-		if (unlink(loglk) == -1 && errno != ENOENT) 
+		if (unlink(loglk) == -1 && errno != ENOENT)
 			warn("log unlink %s, rc = %d", loglk, errno);
 		if (link(logfn, loglk) == -1)
 			warn("log link %s, rc = %d", loglk, errno);
@@ -431,7 +431,7 @@ _psclogv(const struct pfl_callerinfo *pci, int level, int options,
 
 	save_errno = errno;
 
-	thr = pscthr_get();
+	thr = pscthr_get_canfail();
 	/*
 	 * XXX Set log level 5 crashes right away.
 	 */
@@ -482,8 +482,7 @@ _psclogv(const struct pfl_callerinfo *pci, int level, int options,
 	rc = fprintf(stderr, "%s%s", buf, psclog_eol);
 	if (rc < 0)
 		pfl_abort();
-		
-	
+
 	rc = fflush(stderr);
 	if (rc)
 		pfl_abort();
@@ -493,10 +492,10 @@ _psclogv(const struct pfl_callerinfo *pci, int level, int options,
 		syslog(pfl_syslog_map[level], "%s", buf);
 
 	/*
- 	 * On 2.6.32-131.12.1.el6.x86_64-netboot, a spate of log
- 	 * messages cause the thread to hang in the following
- 	 * fprintf(), dragging everyone down.
- 	 */
+	 * On 2.6.32-131.12.1.el6.x86_64-netboot, a spate of log
+	 * messages cause the thread to hang in the following
+	 * fprintf(), dragging everyone down.
+	 */
 	if (level <= PLL_WARN && psc_log_console && pflog_ttyfp)
 		fprintf(pflog_ttyfp, "%s\n", buf);
 
