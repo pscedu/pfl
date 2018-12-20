@@ -3,7 +3,7 @@
 #include <pthread.h>
 #include <stdlib.h>
 
-__thread int t;
+extern __thread int t;
 
 int
 main(int argc, char *argv[])
