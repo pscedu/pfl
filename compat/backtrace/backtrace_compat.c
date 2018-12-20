@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #include <execinfo.h>
 #include <stdlib.h>
 

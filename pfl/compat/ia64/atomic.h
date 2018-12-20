@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #ifndef _PFL_COMPAT_IA64_ATOMIC_H_
 #define _PFL_COMPAT_IA64_ATOMIC_H_
 

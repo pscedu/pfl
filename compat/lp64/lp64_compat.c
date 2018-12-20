@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #include <stdlib.h>
 
 __thread int t;

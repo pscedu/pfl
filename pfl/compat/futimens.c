@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #include <sys/time.h>
 
 int

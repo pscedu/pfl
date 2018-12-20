@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #include <asm/types.h>
 
 #include <stdlib.h>

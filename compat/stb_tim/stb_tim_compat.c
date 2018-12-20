@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #include <sys/stat.h>
 
 #include <stdlib.h>

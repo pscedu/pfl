@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #ifndef _PFL_SDP_INET_H_
 #define _PFL_SDP_INET_H_
 

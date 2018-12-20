@@ -1,4 +1,3 @@
-/* $Id$ */
 /*
  * PostgreSQL Database Management System
  * (formerly known as Postgres, then as Postgres95)

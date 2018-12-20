@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #include <sys/cdefs.h>
 
 #include <stdlib.h>

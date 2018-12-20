@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #include <stdlib.h>
 
 #include <fuse_lowlevel.h>

@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #include <sys/sockio.h>
 
 #include <stdlib.h>

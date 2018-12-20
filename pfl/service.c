@@ -1,5 +1,3 @@
-/* $Id$ */
-
 /*
  *  Copyright (c) 2002, 2003 Cluster File Systems, Inc.
  *

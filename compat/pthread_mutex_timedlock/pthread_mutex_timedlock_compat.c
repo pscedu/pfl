@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #include <pthread.h>
 #include <stdlib.h>
 

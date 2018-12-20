@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #include <aio.h>
 #include <stdlib.h>
 

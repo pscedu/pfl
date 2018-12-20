@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #include <endian.h>
 #include <stdlib.h>
 

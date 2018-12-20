@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #include <fstab.h>
 #include <stdlib.h>
 

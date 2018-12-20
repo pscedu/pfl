@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #include <sys/inotify.h>
 
 #include <stdlib.h>

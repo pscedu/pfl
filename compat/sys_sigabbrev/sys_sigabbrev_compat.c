@@ -1,5 +1,3 @@
-/* $Id$ */
-
 #include <signal.h>
 #include <stdlib.h>
 
