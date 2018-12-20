@@ -84,7 +84,7 @@
 		void *_p;						\
 									\
 		if ((oldp) && (sz) == 0) {				\
-			psc_assert(((fl) & PAF_LOCK) == 0);		\
+			pfl_assert(((fl) & PAF_LOCK) == 0);		\
 			if (((fl) & PAF_NOLOG) == 0)			\
 				psclogs_debug(PSS_MEM,			\
 				    "realloc(%p) to zero (free)",	\

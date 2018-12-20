@@ -85,10 +85,10 @@ startf(void *arg)
 	mask = 1 << thr->pos;
 	for (i = 0; i < niter; i++) {
 		ov = psc_atomic32_setmask_getold(&v32, mask);
-		psc_assert((ov & mask) == 0);
+		pfl_assert((ov & mask) == 0);
 
 		ov = psc_atomic32_clearmask_getold(&v32, mask);
-		psc_assert(ov & mask);
+		pfl_assert(ov & mask);
 		sched_yield();
 	}
 	pthread_barrier_wait(&barrier);
@@ -127,7 +127,7 @@ main(int argc, char *argv[])
 	if (argc)
 		usage();
 
-	psc_assert(psc_atomic64_read(&v64) == UINT64_C(100000000000));
+	pfl_assert(psc_atomic64_read(&v64) == UINT64_C(100000000000));
 	TEST(psc_atomic64, set, &v64, &v64, UINT64_C(2000000000000), UINT64_C(2000000000000));
 	TEST(psc_atomic64, add, &v64, &v64, 15, UINT64_C(2000000000015));
 	TEST(psc_atomic64, sub, &v64, &v64, 9, UINT64_C(2000000000006));

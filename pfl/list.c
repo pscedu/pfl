@@ -33,7 +33,7 @@ psclist_sort(void **p, struct psclist_head *hd, int n, ptrdiff_t off,
 	void *next, *prev;
 	int j = 0;
 
-	psc_assert(n >= 0);
+	pfl_assert(n >= 0);
 	if (n < 2)
 		return;
 

@@ -139,7 +139,7 @@ pll_sort_backwards(void)
 
 	for (i = 0; i < (int) (sizeof(sorted) / sizeof (int)); i++) {
 		it = pll_get(&pll);
-		psc_assert(it->i_v == sorted[i]);
+		pfl_assert(it->i_v == sorted[i]);
 		PSCFREE(it);
 	}
 	printf("Locked list sort backwards seems to be working.\n");
@@ -168,7 +168,7 @@ lc_sort_test(void)
 	}
 	for (i = 0; i < (int) (sizeof(sorted) / sizeof (int)); i++) {
 		m = lc_getwait(&lc);
-		psc_assert(m->v == sorted[i]);
+		pfl_assert(m->v == sorted[i]);
 		PSCFREE(m);
 	}
 
@@ -182,7 +182,7 @@ lc_sort_test(void)
 	}
 	for (i = 0; i < (int) (sizeof(sorted) / sizeof (int)); i++) {
 		m = lc_getwait(&lc);
-		psc_assert(m->v == sorted[i]);
+		pfl_assert(m->v == sorted[i]);
 		PSCFREE(m);
 	}
 
@@ -196,7 +196,7 @@ lc_sort_test(void)
 	}
 	for (i = 0; i < (int) (sizeof(sorted2) / sizeof (int)); i++) {
 		m = lc_getwait(&lc);
-		psc_assert(m->v == sorted2[i]);
+		pfl_assert(m->v == sorted2[i]);
 		PSCFREE(m);
 	}
 
@@ -267,15 +267,15 @@ main(int argc, char *argv[])
 	ts.tv_sec = time(NULL) + 1;
 
 	m = lc_gettimed(&lc, &ts);
-	psc_assert(m->v == 5);
+	pfl_assert(m->v == 5);
 	PSCFREE(m);
 
 	m = lc_gettimed(&lc, &ts);
-	psc_assert(m->v == 8);
+	pfl_assert(m->v == 8);
 	PSCFREE(m);
 
 	m = lc_gettimed(&lc, &ts);
-	psc_assert(m->v == 13);
+	pfl_assert(m->v == 13);
 	PSCFREE(m);
 
 	PFL_ALLOC_OBJ(it);
@@ -309,9 +309,9 @@ main(int argc, char *argv[])
 	pll_add_sorted(&pll, it, it_cmp);
 
 	it = pll_get(&pll);
-	psc_assert(psclist_disjoint(&it->i_lentry));
+	pfl_assert(psclist_disjoint(&it->i_lentry));
 
-	psc_assert(it->i_v == 2);
+	pfl_assert(it->i_v == 2);
 	PSCFREE(it);
 
 	exit(0);

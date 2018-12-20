@@ -145,7 +145,7 @@ typedef struct psc_spinlock {
 			/* PFL_GETTIMEVAL(&(psl)->psl_time); */		\
 			_lrc = 0;					\
 		} else if ((_val) == PSL_UNLOCKED) {			\
-			psc_assert((psl)->psl_owner == 0);		\
+			pfl_assert((psl)->psl_owner == 0);		\
 			(psl)->psl_owner = pthread_self();		\
 			(psl)->psl_owner_file = __FILE__;		\
 			(psl)->psl_owner_lineno = __LINE__;		\

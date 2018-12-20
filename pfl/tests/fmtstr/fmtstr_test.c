@@ -70,7 +70,7 @@ main(int argc, char *argv[])
 	printf("%s\n", b);
 
 	pfl_dump_fflags(O_RDONLY | O_NONBLOCK);
-	psc_assert(stat(".", &stb) == 0);
+	pfl_assert(stat(".", &stb) == 0);
 	pfl_dump_mode(stb.st_mode);
 	pfl_dump_statbuf(&stb);
 

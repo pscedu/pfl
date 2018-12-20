@@ -149,9 +149,9 @@ struct psc_poolmgr {
 /* Sanity check */
 #define POOL_CHECK(m)							\
 	do {								\
-		psc_assert((m)->ppm_min >= 0);				\
-		psc_assert((m)->ppm_max >= 0);				\
-		psc_assert((m)->ppm_total >= 0);			\
+		pfl_assert((m)->ppm_min >= 0);				\
+		pfl_assert((m)->ppm_max >= 0);				\
+		pfl_assert((m)->ppm_total >= 0);			\
 	} while (0)
 
 #define POOL_IS_MLIST(m)	((m)->ppm_flags & PPMF_MLIST)
@@ -201,7 +201,7 @@ int psc_pool_try_shrink(struct psc_poolmgr *, int);
 #define PPGF_SHALLOW			(1 << 1)
 
 #if PFL_DEBUG >= 2
-# define _PSC_POOL_CHECK_OBJ(m, p)	psc_assert(pfl_memchk((p), 0xa5, (m)->ppm_entsize));
+# define _PSC_POOL_CHECK_OBJ(m, p)	pfl_assert(pfl_memchk((p), 0xa5, (m)->ppm_entsize));
 # define _PSC_POOL_CLEAR_OBJ(m, p)	memset((p), 0xa5, (m)->ppm_entsize)
 #else
 # define _PSC_POOL_CHECK_OBJ(m, p)	do { } while (0)

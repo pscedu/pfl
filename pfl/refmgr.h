@@ -92,7 +92,7 @@ struct pfl_objref {
 #  define PSC_OBJ_MAGIC			UINT64_C(0x3452341223456345)
 #  define PSC_OBJ_CHECK(pr)						\
 	do {								\
-		psc_assert((pr)->pobj_magic == PSC_OBJ_MAGIC);		\
+		pfl_assert((pr)->pobj_magic == PSC_OBJ_MAGIC);		\
 	} while (0)
 #else
 #  define PSC_OBJ_CHECK(pr)
@@ -141,7 +141,7 @@ pfl_obj_getref(const struct psc_refmgr *prm, void *p)
 {
 	struct pfl_objref *pobj;
 
-	psc_assert(p);
+	pfl_assert(p);
 	pobj = (void *)((char *)p - prm->prm_private_offset);
 	PSC_OBJ_CHECK(pobj);
 	return (pobj);

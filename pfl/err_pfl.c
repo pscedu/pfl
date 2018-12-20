@@ -65,8 +65,8 @@ pfl_register_errno(int code, const char *str)
 	q = code;
 	e = psc_hashtbl_search(&pfl_errno_hashtbl, &q);
 	if (e) {
-		psc_assert(e->code == q);
-		psc_assert(strcmp(e->str, str) == 0);
+		pfl_assert(e->code == q);
+		pfl_assert(strcmp(e->str, str) == 0);
 		return;
 	}
 
@@ -91,7 +91,7 @@ pfl_strerror(int error)
 	uint64_t q;
 
 #if DEBUG > 1
-	psc_assert(error > 0);
+	pfl_assert(error > 0);
 #endif
 	error = abs(error);
 

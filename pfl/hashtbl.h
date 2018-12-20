@@ -242,7 +242,7 @@ psc_hashent_getlentry(const struct psc_hashtbl *t, void *p)
 {
 	void *e;
 
-	psc_assert(p);
+	pfl_assert(p);
 	e = (char *)p + t->pht_hentoff;
 	return (e);
 }
@@ -250,7 +250,7 @@ psc_hashent_getlentry(const struct psc_hashtbl *t, void *p)
 static __inline const void *
 psc_hashent_getid(const struct psc_hashtbl *t, const void *p)
 {
-	psc_assert(p);
+	pfl_assert(p);
 	return ((const char *)p + t->pht_idoff);
 }
 

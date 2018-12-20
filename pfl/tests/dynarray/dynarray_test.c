@@ -90,7 +90,7 @@ _check(PFL_CALLERINFO_ARG, struct psc_dynarray *da, ...)
 	}
 	va_end(c);
 	va_end(ap);
-	psc_assert(va_arg(ap, void *) == NULL);
+	pfl_assert(va_arg(ap, void *) == NULL);
 }
 
 int
@@ -141,14 +141,14 @@ main(int argc, char *argv[])
 
 	psc_dynarray_sort(&da, qsort, pcmp); CHECK(&da, PTR_1, PTR_2, PTR_4, PTR_a, PTR_b, NULL);
 
-	psc_assert(psc_dynarray_bsearch(&da, PTR_0, cmp) == 0);
-	psc_assert(psc_dynarray_bsearch(&da, PTR_1, cmp) == 0);
-	psc_assert(psc_dynarray_bsearch(&da, PTR_2, cmp) == 1);
-	psc_assert(psc_dynarray_bsearch(&da, PTR_3, cmp) == 2);
-	psc_assert(psc_dynarray_bsearch(&da, PTR_4, cmp) == 2);
-	psc_assert(psc_dynarray_bsearch(&da, PTR_a, cmp) == 3);
-	psc_assert(psc_dynarray_bsearch(&da, PTR_b, cmp) == 4);
-	psc_assert(psc_dynarray_bsearch(&da, PTR_c, cmp) == 5);
+	pfl_assert(psc_dynarray_bsearch(&da, PTR_0, cmp) == 0);
+	pfl_assert(psc_dynarray_bsearch(&da, PTR_1, cmp) == 0);
+	pfl_assert(psc_dynarray_bsearch(&da, PTR_2, cmp) == 1);
+	pfl_assert(psc_dynarray_bsearch(&da, PTR_3, cmp) == 2);
+	pfl_assert(psc_dynarray_bsearch(&da, PTR_4, cmp) == 2);
+	pfl_assert(psc_dynarray_bsearch(&da, PTR_a, cmp) == 3);
+	pfl_assert(psc_dynarray_bsearch(&da, PTR_b, cmp) == 4);
+	pfl_assert(psc_dynarray_bsearch(&da, PTR_c, cmp) == 5);
 
 	psc_dynarray_splice(&da, 2, 1, NULL, 0); CHECK(&da, PTR_1, PTR_2, PTR_a, PTR_b, NULL);
 	psc_dynarray_splice(&da, 0, 1, NULL, 0); CHECK(&da, PTR_2, PTR_a, PTR_b, NULL);
@@ -183,33 +183,33 @@ main(int argc, char *argv[])
 	psc_dynarray_add(&da, "foobar-d");
 	psc_dynarray_add(&da, "foobar-e");
 	psc_dynarray_add(&da, "foobar-f");
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-a", (void *)strcmp)), "foobar-a") == 0);
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-b", (void *)strcmp)), "foobar-b") == 0);
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-c", (void *)strcmp)), "foobar-c") == 0);
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-d", (void *)strcmp)), "foobar-d") == 0);
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-e", (void *)strcmp)), "foobar-e") == 0);
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-f", (void *)strcmp)), "foobar-f") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-a", (void *)strcmp)), "foobar-a") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-b", (void *)strcmp)), "foobar-b") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-c", (void *)strcmp)), "foobar-c") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-d", (void *)strcmp)), "foobar-d") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-e", (void *)strcmp)), "foobar-e") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-f", (void *)strcmp)), "foobar-f") == 0);
 	psc_dynarray_splice(&da, 0, 1, NULL, 0);
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-b", (void *)strcmp)), "foobar-b") == 0);
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-c", (void *)strcmp)), "foobar-c") == 0);
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-d", (void *)strcmp)), "foobar-d") == 0);
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-e", (void *)strcmp)), "foobar-e") == 0);
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-f", (void *)strcmp)), "foobar-f") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-b", (void *)strcmp)), "foobar-b") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-c", (void *)strcmp)), "foobar-c") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-d", (void *)strcmp)), "foobar-d") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-e", (void *)strcmp)), "foobar-e") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-f", (void *)strcmp)), "foobar-f") == 0);
 	psc_dynarray_splice(&da, 2, 1, NULL, 0);
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-b", (void *)strcmp)), "foobar-b") == 0);
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-c", (void *)strcmp)), "foobar-c") == 0);
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-e", (void *)strcmp)), "foobar-e") == 0);
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-f", (void *)strcmp)), "foobar-f") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-b", (void *)strcmp)), "foobar-b") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-c", (void *)strcmp)), "foobar-c") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-e", (void *)strcmp)), "foobar-e") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-f", (void *)strcmp)), "foobar-f") == 0);
 	psc_dynarray_splice(&da, 3, 1, NULL, 0);
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-b", (void *)strcmp)), "foobar-b") == 0);
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-c", (void *)strcmp)), "foobar-c") == 0);
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-e", (void *)strcmp)), "foobar-e") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-b", (void *)strcmp)), "foobar-b") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-c", (void *)strcmp)), "foobar-c") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-e", (void *)strcmp)), "foobar-e") == 0);
 	psc_dynarray_splice(&da, 1, 1, NULL, 0);
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-b", (void *)strcmp)), "foobar-b") == 0);
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-e", (void *)strcmp)), "foobar-e") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-b", (void *)strcmp)), "foobar-b") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-e", (void *)strcmp)), "foobar-e") == 0);
 	CHECK(&da, "foobar-b", "foobar-e", NULL);
 	psc_dynarray_splice(&da, 0, 1, NULL, 0);
-	psc_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-e", (void *)strcmp)), "foobar-e") == 0);
+	pfl_assert(strcmp(psc_dynarray_getpos(&da, psc_dynarray_bsearch(&da, "foobar-e", (void *)strcmp)), "foobar-e") == 0);
 	CHECK(&da, "foobar-e", NULL);
 	psc_dynarray_free(&da);
 
@@ -219,7 +219,7 @@ main(int argc, char *argv[])
 
 		psc_dynarray_splice(&da, i, 0, &foo, 1);
 		for (j = 0; j < i; j++) 
-			psc_assert(psc_dynarray_getpos(&da, j) ==
+			pfl_assert(psc_dynarray_getpos(&da, j) ==
 			    (void *)(uintptr_t)j);
 	}
 

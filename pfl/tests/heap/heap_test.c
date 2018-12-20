@@ -89,7 +89,7 @@ main(__unusedx int argc, __unusedx char *argv[])
 
 	pfl_init();
 
-	psc_assert(sizeof(struct a) == 8);
+	pfl_assert(sizeof(struct a) == 8);
 
 	for (i = 0; i < 1000; i++) 
 		add(psc_random32u(100));
@@ -97,7 +97,7 @@ main(__unusedx int argc, __unusedx char *argv[])
 	last = -1;
 	while ((p = pfl_heap_shift(&hp))) {
 		printf("%d\n", p->val);
-		psc_assert(p->val >= last);
+		pfl_assert(p->val >= last);
 		last = p->val;
 		PSCFREE(p);
 	}

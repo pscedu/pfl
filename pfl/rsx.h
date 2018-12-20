@@ -54,7 +54,7 @@ struct rsx_msg_portablizer {
 			     srv_max_reply_size);			\
 		_rc = pscrpc_pack_reply((rq), (np), (plens), NULL);	\
 		if (_rc) {						\
-			psc_assert(_rc == -ENOMEM);			\
+			pfl_assert(_rc == -ENOMEM);			\
 			psclog_errorx("pscrpc_pack_reply failed: %s",	\
 			    strerror(_rc));				\
 			return (_rc);					\

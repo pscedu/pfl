@@ -126,8 +126,8 @@ pfl_wndmap_clearpos(struct pfl_wndmap *wm, size_t pos)
 	size_t n;
 
 	WNDMAP_LOCK(wm);
-	psc_assert(pfl_wndmap_find(wm, pos, &wb, &n));
-	psc_assert(wb->pwmb_buf[n / NBBY] & (1 << (n % NBBY - 1)));
+	pfl_assert(pfl_wndmap_find(wm, pos, &wb, &n));
+	pfl_assert(wb->pwmb_buf[n / NBBY] & (1 << (n % NBBY - 1)));
 	wb->pwmb_buf[n / NBBY] &= ~(1 << (n % NBBY - 1));
 
 	if (pos == wm->pwm_nextmin)
@@ -155,7 +155,7 @@ pfl_wndmap_getnext(struct pfl_wndmap *wm)
 		for (n = 0; n < WMBSZ; n++) {
 			if (wb->pwmb_buf[n / NBBY] != 0xff) {
 				j = ffs(~wb->pwmb_buf[n / NBBY]);
-				psc_assert(j != NBBY + 1);
+				pfl_assert(j != NBBY + 1);
 				pos += j;
 				wb->pwmb_buf[n / NBBY] |=
 				    1 << (n % NBBY - 1);

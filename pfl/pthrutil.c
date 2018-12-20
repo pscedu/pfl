@@ -90,7 +90,7 @@ _psc_mutex_lock(PFL_CALLERINFO_ARG, struct pfl_mutex *mut)
 	int rc;
 
 #if PFL_DEBUG > 1
-	psc_assert(!pfl_memchk(mut, 0, sizeof(*mut)));
+	pfl_assert(!pfl_memchk(mut, 0, sizeof(*mut)));
 #endif
 
 	rc = pthread_mutex_lock(&mut->pm_mutex);
@@ -149,7 +149,7 @@ _psc_mutex_trylock(PFL_CALLERINFO_ARG, struct pfl_mutex *mut)
 {
 	int rc;
 
-	psc_assert(!psc_mutex_haslock(mut));
+	pfl_assert(!psc_mutex_haslock(mut));
 	rc = pthread_mutex_trylock(&mut->pm_mutex);
 	if (rc == 0) {
 		mut->pm_owner = pthread_self();
@@ -182,7 +182,7 @@ _psc_mutex_tryreqlock(PFL_CALLERINFO_ARG, struct pfl_mutex *mut,
 void
 _psc_mutex_ensure_locked(PFL_CALLERINFO_ARG, struct pfl_mutex *m)
 {
-	psc_assert(psc_mutex_haslock(m));
+	pfl_assert(psc_mutex_haslock(m));
 }
 
 void
@@ -217,11 +217,11 @@ _pfl_rwlock_rdlock(PFL_CALLERINFO_ARG, struct pfl_rwlock *rw)
 	int rc;
 
 	p = pthread_self();
-	psc_assert(rw->pr_writer != p);
+	pfl_assert(rw->pr_writer != p);
 
 	pa = (void *)(uintptr_t)p;
 	spinlock(&rw->pr_lock);
-	psc_assert(!psc_dynarray_exists(&rw->pr_readers, pa));
+	pfl_assert(!psc_dynarray_exists(&rw->pr_readers, pa));
 	psc_dynarray_add(&rw->pr_readers, pa);
 	freelock(&rw->pr_lock);
 
@@ -238,7 +238,7 @@ _pfl_rwlock_wrlock(PFL_CALLERINFO_ARG, struct pfl_rwlock *rw)
 	int rc;
 
 	p = pthread_self();
-	psc_assert(rw->pr_writer != p);
+	pfl_assert(rw->pr_writer != p);
 
 	rc = pthread_rwlock_wrlock(&rw->pr_rwlock);
 	if (rc)

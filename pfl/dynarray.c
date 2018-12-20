@@ -157,7 +157,7 @@ psc_dynarray_add_ifdne(struct psc_dynarray *pda, void *item)
 void *
 psc_dynarray_getpos(const struct psc_dynarray *pda, int pos)
 {
-	psc_assert(pos >= 0);
+	pfl_assert(pos >= 0);
 	if (pos >= psc_dynarray_len(pda))
 		psc_fatalx("out of bounds array access");
 	return (pda->pda_items[pos]);
@@ -172,7 +172,7 @@ psc_dynarray_getpos(const struct psc_dynarray *pda, int pos)
 void
 psc_dynarray_setpos(struct psc_dynarray *pda, int pos, void *p)
 {
-	psc_assert(pos >= 0);
+	pfl_assert(pos >= 0);
 	if (pos >= pda->pda_nalloc)
 		psc_fatalx("out of bounds array access");
 	pda->pda_items[pos] = p;
@@ -229,7 +229,7 @@ psc_dynarray_removepos(struct psc_dynarray *pda, int pos)
 	void **p;
 
 	p = psc_dynarray_get_mutable(pda);
-	psc_assert(pos >= 0 && pos < psc_dynarray_len(pda));
+	pfl_assert(pos >= 0 && pos < psc_dynarray_len(pda));
 	if (pos != psc_dynarray_len(pda) - 1)
 		p[pos] = p[psc_dynarray_len(pda) - 1];
 	pda->pda_pos--;
@@ -271,9 +271,9 @@ psc_dynarray_splice(struct psc_dynarray *pda, int off, int nrmv,
 	void **p;
 
 	oldlen = psc_dynarray_len(pda);
-	psc_assert(nadd >= 0);
-	psc_assert(nrmv >= 0);
-	psc_assert(off + nrmv <= oldlen);
+	pfl_assert(nadd >= 0);
+	pfl_assert(nrmv >= 0);
+	pfl_assert(off + nrmv <= oldlen);
 	rc = psc_dynarray_ensurelen(pda, oldlen + nadd - nrmv);
 	if (rc)
 		return (rc);
@@ -354,10 +354,10 @@ psc_dynarray_swap(struct psc_dynarray *da, int a, int b)
 {
 	void *tmp;
 
-	psc_assert(a >= 0);
-	psc_assert(b >= 0);
-	psc_assert(a < psc_dynarray_len(da));
-	psc_assert(b < psc_dynarray_len(da));
+	pfl_assert(a >= 0);
+	pfl_assert(b >= 0);
+	pfl_assert(a < psc_dynarray_len(da));
+	pfl_assert(b < psc_dynarray_len(da));
 	if (a != b)
 		SWAP(da->pda_items[a], da->pda_items[b], tmp);
 }

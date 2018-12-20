@@ -38,7 +38,7 @@ _pfl_workq_getitem(const char *typename, int (*cb)(void *), size_t len,
 	struct pfl_workrq *wk;
 	void *p;
 
-	psc_assert(len <= pfl_workrq_pool->ppm_entsize - sizeof(*wk));
+	pfl_assert(len <= pfl_workrq_pool->ppm_entsize - sizeof(*wk));
 	if (flags & PFL_WKF_NONBLOCK) {
 		wk = psc_pool_tryget(pfl_workrq_pool);
 		if (wk == NULL)
@@ -57,7 +57,7 @@ _pfl_workq_putitemq(struct psc_listcache *lc, void *p, int tails)
 {
 	struct pfl_workrq *wk;
 
-	psc_assert(p);
+	pfl_assert(p);
 	wk = PSC_AGP(p, -sizeof(*wk));
 	psclog_debug("placing work %p on queue %p", wk, lc);
 	if (tails)

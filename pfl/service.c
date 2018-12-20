@@ -148,7 +148,7 @@ pscrpc_server_post_idle_rqbds(struct pscrpc_service *svc)
 
 		SVC_ULOCK(svc);
 
-		psc_assert(rqbd->rqbd_buffer);
+		pfl_assert(rqbd->rqbd_buffer);
 		rc = pscrpc_register_rqbd(rqbd);
 		if (rc)
 			break;
@@ -683,7 +683,7 @@ pscrpcthr_main(struct psc_thread *thr)
 	if (prt->prt_svh->svh_initf)
 		prt->prt_svh->svh_initf();
 	svc = prt->prt_svh->svh_service;
-	psc_assert(svc);
+	pfl_assert(svc);
 
 	if (svc->srv_init) {
 		rc = svc->srv_init(thr);
@@ -1091,7 +1091,7 @@ _pscrpc_svh_spawn(struct pscrpc_svc_handle *svh)
 	    svh->svh_req_portal, svh->svh_rep_portal, svh->svh_svc_name,
 	    svh->svh_handler, svh->svh_flags);
 
-	psc_assert(svh->svh_service);
+	pfl_assert(svh->svh_service);
 
 	/* Track the service handle */
 	INIT_PSC_LISTENTRY(&svh->svh_lentry);

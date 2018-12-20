@@ -119,7 +119,7 @@ rsx_bulkserver(struct pscrpc_request *rq, int type, int ptl,
 	uint8_t *v1;
 	char buf[PSCRPC_NIDSTR_SIZE];
 
-	psc_assert(type == BULK_GET_SINK || type == BULK_PUT_SOURCE);
+	pfl_assert(type == BULK_GET_SINK || type == BULK_PUT_SOURCE);
 
 	desc = pscrpc_prep_bulk_exp(rq, n, type, ptl);
 	if (desc == NULL) {
@@ -241,7 +241,7 @@ rsx_bulkclient(struct pscrpc_request *rq, int type, int ptl,
 	struct pscrpc_bulk_desc *desc;
 	int i;
 
-	psc_assert(type == BULK_GET_SOURCE || type == BULK_PUT_SINK);
+	pfl_assert(type == BULK_GET_SOURCE || type == BULK_PUT_SINK);
 
 	desc = pscrpc_prep_bulk_imp(rq, n, type, ptl);
 	if (desc == NULL)

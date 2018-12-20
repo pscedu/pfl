@@ -250,17 +250,17 @@ pjournal_next_slot(struct psc_journal_xidhndl *xh)
 	t = pll_peekhead(&pj->pj_pendingxids);
 	if (t) {
 		tail_slot = t->pjx_slot;
-		psc_assert(tail_slot != slot);
+		pfl_assert(tail_slot != slot);
 	}
 
 	/* Update the slot to be written by the next log entry */
-	psc_assert(pj->pj_nextwrite < pj->pj_total);
+	pfl_assert(pj->pj_nextwrite < pj->pj_total);
 	if (++pj->pj_nextwrite == pj->pj_total) {
 		pj->pj_nextwrite = 0;
 		pj->pj_wraparound++;
 		OPSTAT_INCR("journal-wraparound");
 	}
-	psc_assert(pj->pj_resrv > 0);
+	pfl_assert(pj->pj_resrv > 0);
 
 	pj->pj_inuse++;
 	xh->pjx_slot = slot;
@@ -283,7 +283,7 @@ pjournal_xnew(struct psc_journal *pj, int distill, uint64_t txg)
 	struct psc_journal_xidhndl *xh;
 
 	spinlock(&pjournal_count);
-	psc_assert(++total_trans <= total_reserve);
+	pfl_assert(++total_trans <= total_reserve);
 	freelock(&pjournal_count);
 
 	xh = psc_pool_get(pfl_xidhndl_pool);
@@ -306,9 +306,9 @@ pjournal_xnew(struct psc_journal *pj, int distill, uint64_t txg)
 void
 pjournal_xdestroy(struct psc_journal_xidhndl *xh)
 {
-	psc_assert(psclist_disjoint(&xh->pjx_pndg_lentry));
-	psc_assert(psclist_disjoint(&xh->pjx_dstl_lentry));
-	psc_assert(xh->pjx_data == NULL);
+	pfl_assert(psclist_disjoint(&xh->pjx_pndg_lentry));
+	pfl_assert(psclist_disjoint(&xh->pjx_dstl_lentry));
+	pfl_assert(xh->pjx_data == NULL);
 	psc_pool_return(pfl_xidhndl_pool, xh);
 }
 
@@ -324,7 +324,7 @@ pjournal_reserve_slot(struct psc_journal *pj, int count)
 
 	spinlock(&pjournal_reserve);
 
-	psc_assert(!(pj->pj_flags & PJF_REPLAYINPROG));
+	pfl_assert(!(pj->pj_flags & PJF_REPLAYINPROG));
 	while (count) {
 		PJ_LOCK(pj);
 		if (pj->pj_resrv + pj->pj_inuse < pj->pj_total) {
@@ -349,7 +349,7 @@ pjournal_reserve_slot(struct psc_journal *pj, int count)
 			continue;
 		}
 		spinlock(&t->pjx_lock);
-		psc_assert(t->pjx_slot < pj->pj_total);
+		pfl_assert(t->pjx_slot < pj->pj_total);
 		if (t->pjx_txg > pj->pj_commit_txg) {
 			uint64_t txg;
 
@@ -394,7 +394,7 @@ void
 pjournal_unreserve_slot(struct psc_journal *pj, int count)
 {
 	PJ_LOCK(pj);
-	psc_assert(pj->pj_resrv >= (uint32_t) count);
+	pfl_assert(pj->pj_resrv >= (uint32_t) count);
 	pj->pj_resrv -= count;
 	if (pj->pj_flags & PJF_WANTSLOT) {
 		pj->pj_flags &= ~PJF_WANTSLOT;
@@ -417,7 +417,7 @@ pjournal_add_entry(struct psc_journal *pj, uint64_t txg,
 	xh = pjournal_xnew(pj, distill, txg);
 
 	pje = DATA_2_PJE(buf);
-	psc_assert(pje->pje_magic == PJE_MAGIC);
+	pfl_assert(pje->pje_magic == PJE_MAGIC);
 
 	slot = pjournal_logwrite(xh, type | PJE_NORMAL, pje, size);
 	return (slot);
@@ -428,7 +428,7 @@ pjournal_get_buf(struct psc_journal *pj, size_t size)
 {
 	struct psc_journal_enthdr *pje;
 
-	psc_assert(size <= PJ_PJESZ(pj) -
+	pfl_assert(size <= PJ_PJESZ(pj) -
 	    offsetof(struct psc_journal_enthdr, pje_data));
 
 	PJ_LOCK(pj);
@@ -441,7 +441,7 @@ pjournal_get_buf(struct psc_journal *pj, size_t size)
 	}
 	pje = psc_dynarray_getpos(&pj->pj_bufs, 0);
 	psc_dynarray_remove(&pj->pj_bufs, pje);
-	psc_assert(pje->pje_magic == PJE_MAGIC);
+	pfl_assert(pje->pje_magic == PJE_MAGIC);
 	PJ_ULOCK(pj);
 	return (PJE_DATA(pje));
 }
@@ -452,7 +452,7 @@ pjournal_put_buf(struct psc_journal *pj, void *buf)
 	struct psc_journal_enthdr *pje;
 
 	pje = DATA_2_PJE(buf);
-	psc_assert(pje->pje_magic == PJE_MAGIC);
+	pfl_assert(pje->pje_magic == PJE_MAGIC);
 
 	OPSTAT_INCR("journal-put-buf");
 	PJ_LOCK(pj);
@@ -567,7 +567,7 @@ pjournal_logwrite(struct psc_journal_xidhndl *xh, int type,
 		psc_waitq_wakeall(&pjournal_waitq);
 		freelock(&pjournal_waitqlock);
 	} else {
-		psc_assert(!xh->pjx_data);
+		pfl_assert(!xh->pjx_data);
 		freelock(&xh->pjx_lock);
 	}
 	return (xh->pjx_slot);
@@ -622,7 +622,7 @@ pjournal_scan_slots(struct psc_journal *pj)
 	 */
 	jbuf = pjournal_alloc_buf(pj);
 	count = pj->pj_hdr->pjh_readsize;
-	psc_assert((pj->pj_total % count) == 0);
+	pfl_assert((pj->pj_total % count) == 0);
 	while (slot < pj->pj_total) {
 		rc = psc_journal_read(pj, jbuf, PJ_PJESZ(pj) * count,
 		    PJ_GETENTOFF(pj, slot));
@@ -652,7 +652,7 @@ pjournal_scan_slots(struct psc_journal *pj)
 				rc = -1;
 				continue;
 			}
-			psc_assert((pje->pje_type & PJE_FORMAT) ||
+			pfl_assert((pje->pje_type & PJE_FORMAT) ||
 				   (pje->pje_type & PJE_NORMAL));
 
 			/*
@@ -667,7 +667,7 @@ pjournal_scan_slots(struct psc_journal *pj)
 			 * never see such an entry.
 			 */
 			if (pje->pje_type & PJE_FORMAT) {
-				psc_assert(pje->pje_len == 0);
+				pfl_assert(pje->pje_len == 0);
 				goto done;
 			}
 			/*
@@ -896,7 +896,7 @@ pjournal_thr_main(struct psc_thread *thr)
 			psclog_debug("xh=%p xh->pjx_flags=%d", xh,
 			    xh->pjx_flags);
 			spinlock(&xh->pjx_lock);
-			psc_assert(xh->pjx_flags & PJX_DISTILL);
+			pfl_assert(xh->pjx_flags & PJX_DISTILL);
 
 			if (!(xh->pjx_flags & PJX_WRITTEN)) {
 				freelock(&xh->pjx_lock);
@@ -920,7 +920,7 @@ pjournal_thr_main(struct psc_thread *thr)
 			 * committed by the ZFS.
 			 */
 			spinlock(&xh->pjx_lock);
-			psc_assert(xid < xh->pjx_xid);
+			pfl_assert(xid < xh->pjx_xid);
 			xid = xh->pjx_xid;
 
 			if (txg > xh->pjx_txg)
@@ -956,7 +956,7 @@ pjournal_thr_main(struct psc_thread *thr)
 		 */
 		if (pj->pj_commit_txg > txg) {
 			once++;
-			psc_assert(once <= 1);
+			pfl_assert(once <= 1);
 			psclog_warnx("Journal txg goes backwards: "
 			    "%"PRId64" -> %"PRId64,
 			    pj->pj_commit_txg, txg);
@@ -979,7 +979,7 @@ pjournal_thr_main(struct psc_thread *thr)
 			pll_remove(&pj->pj_pendingxids, xh);
 			freelock(&xh->pjx_lock);
 			pjournal_xdestroy(xh);
-			psc_assert(pj->pj_inuse > 0);
+			pfl_assert(pj->pj_inuse > 0);
 			pj->pj_inuse--;
 		}
 		PJ_ULOCK(pj);

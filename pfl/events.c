@@ -698,7 +698,7 @@ pscrpc_ni_init(int type, int nmsgs)
 		rc = LNetEQAlloc(10240, 0, &pscrpc_eq_h);
 	}
 
-	psc_assert(rc == 0);
+	pfl_assert(rc == 0);
 
 	if (LNetGetId(1, &my_id))
 		psc_fatalx("LNetGetId() failed");

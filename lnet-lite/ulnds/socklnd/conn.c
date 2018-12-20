@@ -654,8 +654,8 @@ usocklnd_destroy_peer(usock_peer_t *peer)
         for (i = 0; i < N_CONN_TYPES; i++)
                 LASSERT (peer->up_conns[i] == NULL);
 
-	psc_assert(peer->up_iostats.rd == NULL);
-	psc_assert(peer->up_iostats.wr == NULL); 
+	pfl_assert(peer->up_iostats.rd == NULL);
+	pfl_assert(peer->up_iostats.wr == NULL); 
 
 	/* Inform all eq's to drop associations to this peer. */
 	LNET_LOCK();

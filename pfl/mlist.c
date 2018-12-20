@@ -108,7 +108,7 @@ _pfl_mlist_init(struct pfl_mlist *pml, int flags, void *mwcarg,
 void
 pfl_mlist_destroy(struct pfl_mlist *ml)
 {
-	psc_assert(pll_nitems(&ml->pml_pll) == 0);
+	pfl_assert(pll_nitems(&ml->pml_pll) == 0);
 	pfl_opstat_destroy(ml->pml_nseen);
 	pfl_multiwaitcond_destroy(&ml->pml_mwcond_empty);
 }

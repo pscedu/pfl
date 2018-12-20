@@ -148,14 +148,14 @@ pfl_multiwaitcond_destroy(struct pfl_multiwaitcond *mwc)
 			psc_fatalx("waking condition %s wants to go away "
 			    "but may corrupt integrity of multiwait %s",
 			    mwc->mwc_name, mw->mw_name);
-		psc_assert(psc_dynarray_len(&mw->mw_conds) ==
+		pfl_assert(psc_dynarray_len(&mw->mw_conds) ==
 		    (int)psc_vbitmap_getsize(mw->mw_condmask));
 
 		DLOG_MULTIWAIT(PLL_DEBUG, mw,
 		    "disassociating cond %s@%p", mwc->mwc_name, mwc);
 		k = psc_dynarray_bsearch(&mwc->mwc_multiwaits, mw,
 		    pfl_multiwaitcond_cmp);
-		psc_assert(psc_dynarray_getpos(&mwc->mwc_multiwaits,
+		pfl_assert(psc_dynarray_getpos(&mwc->mwc_multiwaits,
 		    k) == mw);
 		psc_dynarray_splice(&mwc->mwc_multiwaits, k, 1, NULL, 0);
 
@@ -305,7 +305,7 @@ _pfl_multiwait_addcond(struct pfl_multiwait *mw,
 			psc_fatalx("mwc %s already registered in multiwait %s",
 			    mwc->mwc_name, mw->mw_name);
 
-	psc_assert(psc_dynarray_len(&mw->mw_conds) ==
+	pfl_assert(psc_dynarray_len(&mw->mw_conds) ==
 	    (int)psc_vbitmap_getsize(mw->mw_condmask));
 
 	/* Associate condition and multiwait with each other. */
@@ -589,7 +589,7 @@ void
 pfl_multiwait_leavecritsect(struct pfl_multiwait *mw)
 {
 	psc_mutex_lock(&mw->mw_mutex);
-	psc_assert(mw->mw_flags & PMWF_CRITSECT);
+	pfl_assert(mw->mw_flags & PMWF_CRITSECT);
 	mw->mw_flags &= ~PMWF_CRITSECT;
 	psc_mutex_unlock(&mw->mw_mutex);
 }

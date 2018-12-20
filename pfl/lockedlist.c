@@ -60,7 +60,7 @@ _pll_remove(const struct pfl_callerinfo *pci,
 	e = _pll_obj2entry(pll, p);
 	locked = PLL_RLOCK(pll);
 	psclist_del(e, &pll->pll_listhd);
-	psc_assert(pll->pll_nitems > 0);
+	pfl_assert(pll->pll_nitems > 0);
 	pll->pll_nitems--;
 	PLL_URLOCK(pll, locked);
 	if ((pll->pll_flags & PLLF_NOLOG) == 0)

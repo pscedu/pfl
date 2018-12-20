@@ -104,33 +104,33 @@ main(int argc, char *argv[])
 		usage();
 
 	f = 0;
-	CNT_ASSERT0(f = B1; psc_assert( pfl_bitstr_setchk(&f, NULL, B1, 0, 0, 0, 0)));
-	CNT_ASSERT0(f = B1; psc_assert(!pfl_bitstr_setchk(&f, NULL, 0, B1, 0, 0, 0)));
-	CNT_ASSERT0(f = B2; psc_assert( pfl_bitstr_setchk(&f, NULL, B2, B3, 0, 0, 0)));
+	CNT_ASSERT0(f = B1; pfl_assert( pfl_bitstr_setchk(&f, NULL, B1, 0, 0, 0, 0)));
+	CNT_ASSERT0(f = B1; pfl_assert(!pfl_bitstr_setchk(&f, NULL, 0, B1, 0, 0, 0)));
+	CNT_ASSERT0(f = B2; pfl_assert( pfl_bitstr_setchk(&f, NULL, B2, B3, 0, 0, 0)));
 
-	CNT_ASSERT0(psc_assert( pfl_bitstr_setchk(&f, NULL, 0, 0, B1, 0, PFL_BITSTR_SETCHK_STRICT));
-		    psc_assert(!pfl_bitstr_setchk(&f, NULL, 0, 0, B1, 0, PFL_BITSTR_SETCHK_STRICT));
-		    psc_assert(!pfl_bitstr_setchk(&f, NULL, B1|B2, 0, 0, 0, PFL_BITSTR_SETCHK_STRICT));
-		    psc_assert( pfl_bitstr_setchk(&f, NULL, 0, 0, B2, 0, PFL_BITSTR_SETCHK_STRICT));
-		    psc_assert( pfl_bitstr_setchk(&f, NULL, B1|B2, 0, 0, 0, PFL_BITSTR_SETCHK_STRICT));
-		    psc_assert( pfl_bitstr_setchk(&f, NULL, B1, 0, B3, 0, PFL_BITSTR_SETCHK_STRICT));
-		    psc_assert(f==(B1|B2|B3));
-		    psc_assert( pfl_bitstr_setchk(&f, NULL, B3, 0, 0, B2, PFL_BITSTR_SETCHK_STRICT));
-		    psc_assert(f==(B1|B3));
+	CNT_ASSERT0(pfl_assert( pfl_bitstr_setchk(&f, NULL, 0, 0, B1, 0, PFL_BITSTR_SETCHK_STRICT));
+		    pfl_assert(!pfl_bitstr_setchk(&f, NULL, 0, 0, B1, 0, PFL_BITSTR_SETCHK_STRICT));
+		    pfl_assert(!pfl_bitstr_setchk(&f, NULL, B1|B2, 0, 0, 0, PFL_BITSTR_SETCHK_STRICT));
+		    pfl_assert( pfl_bitstr_setchk(&f, NULL, 0, 0, B2, 0, PFL_BITSTR_SETCHK_STRICT));
+		    pfl_assert( pfl_bitstr_setchk(&f, NULL, B1|B2, 0, 0, 0, PFL_BITSTR_SETCHK_STRICT));
+		    pfl_assert( pfl_bitstr_setchk(&f, NULL, B1, 0, B3, 0, PFL_BITSTR_SETCHK_STRICT));
+		    pfl_assert(f==(B1|B2|B3));
+		    pfl_assert( pfl_bitstr_setchk(&f, NULL, B3, 0, 0, B2, PFL_BITSTR_SETCHK_STRICT));
+		    pfl_assert(f==(B1|B3));
 		    );
 
-	CNT_ASSERT0(psc_assert(pfl_bitstr_setchk(&f, NULL, 0, 0, B6, 0, 0)); psc_assert(f == B6));
+	CNT_ASSERT0(pfl_assert(pfl_bitstr_setchk(&f, NULL, 0, 0, B6, 0, 0)); pfl_assert(f == B6));
 
 	v = 0xf;
-	psc_assert(pfl_bitstr_nset(&v, sizeof(v)) == 4);
+	pfl_assert(pfl_bitstr_nset(&v, sizeof(v)) == 4);
 	v = 0xf00;
-	psc_assert(pfl_bitstr_nset(&v, sizeof(v)) == 4);
+	pfl_assert(pfl_bitstr_nset(&v, sizeof(v)) == 4);
 	v = 0xf1f0;
-	psc_assert(pfl_bitstr_nset(&v, 1) == 4);
+	pfl_assert(pfl_bitstr_nset(&v, 1) == 4);
 	v = 0xffff;
-	psc_assert(pfl_bitstr_nset(&v, 2) == 16);
+	pfl_assert(pfl_bitstr_nset(&v, 2) == 16);
 	v = UINT64_C(0xffffffffffffffff);
-	psc_assert(pfl_bitstr_nset(&v, sizeof(v)) == 64);
+	pfl_assert(pfl_bitstr_nset(&v, sizeof(v)) == 64);
 
 	out = 0;
 	in = 0x7fffffff;

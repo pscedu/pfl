@@ -42,14 +42,14 @@
 #include "pfl/time.h"
 
 psc_spinlock_t				  psc_umask_lock = SPINLOCK_INIT;
-__threadx const struct pfl_callerinfo	*_pfl_callerinfo;
+const struct pfl_callerinfo		*_pfl_callerinfo;
 __threadx int				 _pfl_callerinfo_lvl;
 pid_t					  pfl_pid;
 
 struct timespec				  pfl_uptime;
 
 /* no functional usage, used to debug lease expiration time */
-time_t				  	  pfl_start_time;
+time_t					  pfl_start_time;
 
 pid_t
 pfl_getsysthrid(void)
@@ -65,7 +65,7 @@ pfl_getsysthrid(void)
 	int rc;
 
 	rc = thr_self(&id);
-	psc_assert(rc == 0);
+	pfl_assert(rc == 0);
 	return (id);
 #elif defined(HAVE_LIBPTHREAD)
 	return (pthread_self());

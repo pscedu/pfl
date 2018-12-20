@@ -306,12 +306,12 @@ usocklnd_update_tunables()
 			/* 136.142.165.176/28=1480:... */
 
 			val = strchr(p, '=');
-			psc_assert(val);
+			pfl_assert(val);
 			*val++ = '\0';
 			msr->msr_maxseg = strtoull(val, NULL, 0);
 
 			mask = strchr(p, '/');
-			psc_assert(mask);
+			pfl_assert(mask);
 			*mask++ = '\0';
 			msr->msr_mask = ~0 << (32 - strtoull(mask,
 			    NULL, 10));

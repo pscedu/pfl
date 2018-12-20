@@ -58,24 +58,24 @@ main(int argc, char *argv[])
 	if (argc)
 		usage();
 
-	pfl_fmt_ratio(buf,  9998, 10001); psc_assert(strcmp(buf, "99.97%") == 0);
-	pfl_fmt_ratio(buf,  9999, 10001); psc_assert(strcmp(buf, "99.98%") == 0);
-	pfl_fmt_ratio(buf, 10000, 10001); psc_assert(strcmp(buf, "99.99%") == 0);
-	pfl_fmt_ratio(buf, 10001, 10001); psc_assert(strcmp(buf, "100%") == 0);
+	pfl_fmt_ratio(buf,  9998, 10001); pfl_assert(strcmp(buf, "99.97%") == 0);
+	pfl_fmt_ratio(buf,  9999, 10001); pfl_assert(strcmp(buf, "99.98%") == 0);
+	pfl_fmt_ratio(buf, 10000, 10001); pfl_assert(strcmp(buf, "99.99%") == 0);
+	pfl_fmt_ratio(buf, 10001, 10001); pfl_assert(strcmp(buf, "100%") == 0);
 
-	pfl_fmt_human(hbuf, 12); psc_assert(strcmp(hbuf, "    12B") == 0);
+	pfl_fmt_human(hbuf, 12); pfl_assert(strcmp(hbuf, "    12B") == 0);
 
-	pfl_dirname("", fn); psc_assert(strcmp(fn, ".") == 0);
-	pfl_dirname(NULL, fn); psc_assert(strcmp(fn, ".") == 0);
-	pfl_dirname("sdfdf", fn); psc_assert(strcmp(fn, ".") == 0);
-	pfl_dirname("/", fn); psc_assert(strcmp(fn, "/") == 0);
-	pfl_dirname("/foo", fn); psc_assert(strcmp(fn, "/") == 0);
-	pfl_dirname("//", fn); psc_assert(strcmp(fn, "/") == 0);
-	pfl_dirname("////", fn); psc_assert(strcmp(fn, "/") == 0);
-	pfl_dirname("/foo/bar", fn); psc_assert(strcmp(fn, "/foo") == 0);
-	pfl_dirname("/foo/bar/glar", fn); psc_assert(strcmp(fn, "/foo/bar") == 0);
+	pfl_dirname("", fn); pfl_assert(strcmp(fn, ".") == 0);
+	pfl_dirname(NULL, fn); pfl_assert(strcmp(fn, ".") == 0);
+	pfl_dirname("sdfdf", fn); pfl_assert(strcmp(fn, ".") == 0);
+	pfl_dirname("/", fn); pfl_assert(strcmp(fn, "/") == 0);
+	pfl_dirname("/foo", fn); pfl_assert(strcmp(fn, "/") == 0);
+	pfl_dirname("//", fn); pfl_assert(strcmp(fn, "/") == 0);
+	pfl_dirname("////", fn); pfl_assert(strcmp(fn, "/") == 0);
+	pfl_dirname("/foo/bar", fn); pfl_assert(strcmp(fn, "/foo") == 0);
+	pfl_dirname("/foo/bar/glar", fn); pfl_assert(strcmp(fn, "/foo/bar") == 0);
 
-	psc_assert(pfl_humantonum("24g") == INT64_C(24) * 1024 * 1024 * 1024);
+	pfl_assert(pfl_humantonum("24g") == INT64_C(24) * 1024 * 1024 * 1024);
 
 	printf("%"PRIx64"\n", psc_str_hashify("foobar"));
 	printf("%"PRIx64"\n", psc_str_hashify("/"));

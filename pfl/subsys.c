@@ -153,7 +153,7 @@ pfl_subsys_unregister(int ssid)
 {
 	struct pfl_subsys *ss;
 
-	psc_assert(ssid == psc_dynarray_len(&pfl_subsystems) - 1);
+	pfl_assert(ssid == psc_dynarray_len(&pfl_subsystems) - 1);
 	ss = psc_dynarray_getpos(&pfl_subsystems, ssid);
 	psc_dynarray_removepos(&pfl_subsystems, ssid);
 	PSCFREE(ss);

@@ -37,7 +37,7 @@
 
 #define PRFMTSTRCASE(ch, convfmt, ...)					\
 	case ch:							\
-		psc_assert(_t - _p + strlen(convfmt) + 1 <=		\
+		pfl_assert(_t - _p + strlen(convfmt) + 1 <=		\
 		    sizeof(_convbuf));					\
 		_twant = snprintf(_convbuf, sizeof(_convbuf),		\
 		    "%.*s%s", (int)(_t - _p), _p, convfmt);		\
@@ -95,7 +95,7 @@
 #define FMTSTRCASE(ch, convfmt, ...)					\
 	case ch:							\
 		_tlen = _t - _p + strlen(convfmt) + 1;			\
-		psc_assert(_tlen <= sizeof(_convbuf));			\
+		pfl_assert(_tlen <= sizeof(_convbuf));			\
 		/* write temporary buf for conversion specifier */	\
 		_twant = snprintf(_convbuf, sizeof(_convbuf),		\
 		    "%.*s%s", (int)(_t - _p), _p, convfmt);		\

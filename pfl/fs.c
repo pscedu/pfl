@@ -69,7 +69,7 @@ void
 pflfs_modules_rdunpin(void)
 {
 	spinlock(&pflfs_modules_lock);
-	psc_assert(pflfs_modules_pins > 0);
+	pfl_assert(pflfs_modules_pins > 0);
 	pflfs_modules_pins--;
 	freelock(&pflfs_modules_lock);
 }
@@ -236,7 +236,7 @@ pfl_fsthr_getpri(struct psc_thread *thr)
 {
 	struct pfl_fsthr *pft;
 
-	psc_assert(thr->pscthr_type == PFL_THRT_FS);
+	pfl_assert(thr->pscthr_type == PFL_THRT_FS);
 	pft = thr->pscthr_private;
 	return (pft->pft_private);
 }
@@ -246,7 +246,7 @@ pfl_fsthr_setpri(struct psc_thread *thr, void *data)
 {
 	struct pfl_fsthr *pft;
 
-	psc_assert(thr->pscthr_type == PFL_THRT_FS);
+	pfl_assert(thr->pscthr_type == PFL_THRT_FS);
 	pft = thr->pscthr_private;
 	pft->pft_private = data;
 }

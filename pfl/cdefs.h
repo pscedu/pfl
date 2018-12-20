@@ -130,7 +130,7 @@
 // XXX assert(p)
 #define PSC_AGP(p, off)							\
 	_PFL_RVSTART {							\
-		psc_assert(p);						\
+		pfl_assert(p);						\
 		(void *)((char *)(p) + (off));				\
 	} _PFL_RVEND
 

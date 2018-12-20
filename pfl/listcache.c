@@ -58,7 +58,7 @@ _lc_get(struct psc_listcache *plc, const struct timespec *abstime,
 
 	locked = LIST_CACHE_RLOCK(plc);
 //	if (plc->plc_flags & PLCF_DYING)
-//		psc_assert(flags & PLCF_DYINGOK)
+//		pfl_assert(flags & PLCF_DYINGOK)
 	while (lc_empty(plc)) {
 		if ((plc->plc_flags & PLCF_DYING) ||
 		    (flags & PLCBF_NOBLOCK)) {
@@ -78,7 +78,7 @@ _lc_get(struct psc_listcache *plc, const struct timespec *abstime,
 			rc = psc_waitq_waitabs(&plc->plc_wq_empty,
 			    LIST_CACHE_GETLOCK(plc), abstime);
 			if (rc) {
-				psc_assert(rc == ETIMEDOUT);
+				pfl_assert(rc == ETIMEDOUT);
 				errno = rc;
 				return (NULL);
 			}
@@ -127,7 +127,7 @@ _lc_add(struct psc_listcache *plc, void *p, int flags, void *cmpf)
 	locked = LIST_CACHE_RLOCK(plc);
 
 	if (plc->plc_flags & PLCF_DYING) {
-		psc_assert(flags & PLCBF_DYINGOK);
+		pfl_assert(flags & PLCBF_DYINGOK);
 		LIST_CACHE_URLOCK(plc, locked);
 		return (0);
 	}

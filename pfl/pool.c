@@ -207,7 +207,7 @@ _psc_poolmaster_initmgr(struct psc_poolmaster *p, struct psc_poolmgr *m)
 	}
 
 	if (m->ppm_name[0] == '\0')
-		psc_assert(0);
+		pfl_assert(0);
 
 	INIT_PSC_LISTENTRY(&m->ppm_lentry);
 
@@ -326,7 +326,7 @@ psc_pool_try_grow(struct psc_poolmgr *m, int n)
 	void *p;
 	int i, flags;
 
-	psc_assert(n > 0);
+	pfl_assert(n > 0);
 
 	POOL_LOCK(m);
 	POOL_CHECK(m);

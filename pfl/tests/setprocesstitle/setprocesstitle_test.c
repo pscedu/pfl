@@ -83,6 +83,6 @@ main(__unusedx int argc, char *argv[])
 
 	buf[rc] = '\0';
 	buf[strcspn(buf, "\n")] = '\0';
-	psc_assert(strstr(buf, "foobar 13"));
+	pfl_assert(strstr(buf, "foobar 13"));
 	exit(0);
 }

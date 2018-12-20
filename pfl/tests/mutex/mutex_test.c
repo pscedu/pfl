@@ -76,7 +76,7 @@ main(int argc, char *argv[])
 	rc = pthread_create(&pt, NULL, spawn, NULL);
 	psc_compl_wait(&compl);
 
-	psc_assert(!psc_mutex_trylock(&m));
+	pfl_assert(!psc_mutex_trylock(&m));
 
 	while (var == 0) {
 		psc_waitq_wakeall(&wq);
@@ -85,23 +85,23 @@ main(int argc, char *argv[])
 
 	psc_mutex_lock(&m);
 	rc = pthread_mutex_lock(&m.pm_mutex);
-	psc_assert(rc == EDEADLK);
+	pfl_assert(rc == EDEADLK);
 
 	lk = psc_mutex_reqlock(&m);
 
 	psc_mutex_ensure_locked(&m);
 	psc_mutex_ureqlock(&m, lk);
 
-	psc_assert(psc_mutex_tryreqlock(&m, &lk));
+	pfl_assert(psc_mutex_tryreqlock(&m, &lk));
 	psc_mutex_ureqlock(&m, lk);
 
-	psc_assert(psc_mutex_haslock(&m));
+	pfl_assert(psc_mutex_haslock(&m));
 
 	psc_mutex_unlock(&m);
 
-	psc_assert(psc_mutex_haslock(&m) == 0);
+	pfl_assert(psc_mutex_haslock(&m) == 0);
 
-	psc_assert(psc_mutex_tryreqlock(&m, &lk));
+	pfl_assert(psc_mutex_tryreqlock(&m, &lk));
 	psc_mutex_ureqlock(&m, lk);
 	exit(0);
 }

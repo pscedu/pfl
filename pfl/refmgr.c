@@ -226,7 +226,7 @@ pfl_refmgr_lock4obj(struct psc_refmgr *prm, struct pfl_objref *pobj)
 
 	pfl_refmgr_lock_generic(prm);
 	if (prm->prm_flags & PRMF_HASH) {
-		psc_assert(key);
+		pfl_assert(key);
 		b = psc_hashbkt_get(&prm->prm_hashtbl, (char *)pobj +
 		    prm->prm_private_off + prm->prm_privhashidmemb_off);
 		psc_hashbkt_lock(b);
@@ -240,7 +240,7 @@ pfl_refmgr_lock4priv(struct psc_refmgr *prm, void *key)
 
 	pfl_refmgr_lock_generic(prm);
 	if (prm->prm_flags & PRMF_HASH) {
-		psc_assert(key);
+		pfl_assert(key);
 		b = psc_hashbkt_get(&prm->prm_hashtbl,
 		    (char *)key + prm->prm_privhashidmemb_off);
 		psc_hashbkt_lock(b);
@@ -264,7 +264,7 @@ pfl_refmgr_unlock_specific(struct psc_refmgr *prm, void *key)
 	struct psc_hashbkt *b;
 
 	if (prm->prm_flags & PRMF_HASH) {
-		psc_assert(key);
+		pfl_assert(key);
 		b = psc_hashbkt_get(&prm->prm_hashtbl,
 		    (char *)key + prm->prm_privhashidmemb_off);
 		psc_hashtbl_lockbkt(&prm->prm_hash);
@@ -295,7 +295,7 @@ pfl_refmgr_findobj(struct psc_refmgr *prm, int pref, void *key)
 	void *pobj;
 	int locked;
 
-	psc_assert(pref == PRMF_TREE || pref == PRMF_LIST ||
+	pfl_assert(pref == PRMF_TREE || pref == PRMF_LIST ||
 	    pref == PRMF_LRU || pref == PRMF_HASH || pref == PRMF_ANY);
 
 	if ((prm->prm_flags & pref) == PRMF_LIST) {

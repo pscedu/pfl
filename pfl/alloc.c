@@ -127,7 +127,7 @@ _psc_getpma(void *p)
 	memset(&key, 0, sizeof(key));
 	key.p = p;
 	pma = psc_hashtbl_searchdel(&psc_memallocs, &key);
-	psc_assert(pma);
+	pfl_assert(pma);
 	return (pma);
 }
 
@@ -140,7 +140,7 @@ pscmem_checkinnerguard(struct psc_memalloc *pma)
 		len = psc_pagesize - pma->pma_userlen % psc_pagesize;
 		psc_mprotect(MIN(pma->pma_guardbase, pma->pma_userbase),
 		    len, PROT_READ);
-		psc_assert(pfl_memchk(pma->pma_guardbase,
+		pfl_assert(pfl_memchk(pma->pma_guardbase,
 		    PFL_MEMGUARD_MAGIC, len));
 	}
 }
@@ -215,7 +215,7 @@ _psc_realloc(void *oldp, size_t size, int flags)
 	 * behavior differs on systems.
 	 */
 	if (oldp)
-		psc_assert(size);
+		pfl_assert(size);
 
 #if PFL_DEBUG > 1
 	if ((flags & PAF_NOGUARD) == 0) {
@@ -294,7 +294,7 @@ _psc_realloc(void *oldp, size_t size, int flags)
 			 * save on two malloc overhead or pools.
 			 */
 			pma = calloc(1, sizeof(*pma));
-			psc_assert(pma);
+			pfl_assert(pma);
 			psc_hashent_init(&psc_memallocs, pma);
 		}
 

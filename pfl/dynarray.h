@@ -105,7 +105,7 @@ struct psc_dynarray {
 
 #define	psc_dynarray_exists(da, p)	(psc_dynarray_finditem((da), (p)) != -1)
 
-#define pfl_dynarray_xadd(da, p)	psc_assert(!psc_dynarray_add_ifdne((da), (p)))
+#define pfl_dynarray_xadd(da, p)	pfl_assert(!psc_dynarray_add_ifdne((da), (p)))
 
 #define pfl_dynarray_truncate(da, n)					\
 	do {								\

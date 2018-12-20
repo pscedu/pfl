@@ -32,7 +32,7 @@
 	do {							\
 		if ((e)->exp_hldropf)				\
 			(e)->exp_hldropf(e);			\
-		psc_assert((e)->exp_private == NULL);		\
+		pfl_assert((e)->exp_private == NULL);		\
 	} while (0)
 
 #define EXPORT_LOCK(e)		spinlock(&(e)->exp_lock)
@@ -71,8 +71,8 @@ pscrpc_export_put(struct pscrpc_export *exp)
 	int rc;
 
 	rc = atomic_read(&exp->exp_refcount);
-	psc_assert(rc > 0);
-	psc_assert(rc < 0x5a5a5a);
+	pfl_assert(rc > 0);
+	pfl_assert(rc < 0x5a5a5a);
 	PFLOG_EXP(PLL_DEBUG, exp, "decr refcount");
 	_pscrpc_export_put(exp);
 }

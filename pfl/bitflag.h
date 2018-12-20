@@ -88,7 +88,7 @@ pfl_bitstr_setchk(int *f, psc_spinlock_t *lck, int checkon,
  error:
 	if (lck)
 		ureqlock(lck, locked);
-	psc_assert((flags & PFL_BITSTR_SETCHK_ABORT) == 0);
+	pfl_assert((flags & PFL_BITSTR_SETCHK_ABORT) == 0);
 	return (0);
 }
 
@@ -142,7 +142,7 @@ pfl_bitstr_copy(void *dst, int doff, const void *src, int soff, int nbits)
 	const uint64_t *in64;
 	uint64_t *out64;
 
-	psc_assert(doff >= 0 && soff >= 0);
+	pfl_assert(doff >= 0 && soff >= 0);
 //	if (dst + doff  > src + soff &&
 //	    dst + doff < src + soff + nbits)
 //		psc_fatalx("overlap case not implemented");

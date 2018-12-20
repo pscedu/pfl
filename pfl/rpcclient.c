@@ -78,7 +78,7 @@ pscrpc_request_addref(struct pscrpc_request *req)
 __static int
 pscrpc_interpret(struct pscrpc_request *rq)
 {
-	//psc_assert(rq->rq_phase == PSCRPC_RQ_PHASE_COMPLETE);
+	//pfl_assert(rq->rq_phase == PSCRPC_RQ_PHASE_COMPLETE);
 	if (rq->rq_interpret_reply)
 		rq->rq_status = rq->rq_interpret_reply(rq,
 		    &rq->rq_async_args);
@@ -116,7 +116,7 @@ pscrpc_prep_req_pool(struct pscrpc_import *imp, uint32_t version,
 
 	rc = pscrpc_pack_request(request, count, lengths, bufs);
 	if (rc) {
-		psc_assert(!request->rq_pool);
+		pfl_assert(!request->rq_pool);
 		psc_pool_return(pscrpc_rq_pool, request);
 		return (NULL);
 	}
@@ -210,7 +210,7 @@ pscrpc_prep_bulk_imp(struct pscrpc_request *req, int npages, int type,
 	struct pscrpc_import    *imp = req->rq_import;
 	struct pscrpc_bulk_desc *desc;
 
-	psc_assert(type == BULK_PUT_SINK || type == BULK_GET_SOURCE);
+	pfl_assert(type == BULK_PUT_SINK || type == BULK_GET_SOURCE);
 	desc = pscrpc_new_bulk(npages, type, portal);
 	if (desc == NULL)
 		return (NULL);
@@ -224,7 +224,7 @@ pscrpc_prep_bulk_imp(struct pscrpc_request *req, int npages, int type,
 	desc->bd_cbid.cbid_arg = desc;
 
 	/* This makes req own desc, and free it when she frees herself */
-	psc_assert(req->rq_bulk == NULL);
+	pfl_assert(req->rq_bulk == NULL);
 	req->rq_bulk = desc;
 
 	return desc;
@@ -237,7 +237,7 @@ pscrpc_prep_bulk_exp(struct pscrpc_request *req, int npages, int type,
 	struct pscrpc_export   *exp = req->rq_export;
 	struct pscrpc_bulk_desc *desc;
 
-	psc_assert(type == BULK_PUT_SOURCE || type == BULK_GET_SINK);
+	pfl_assert(type == BULK_PUT_SOURCE || type == BULK_GET_SINK);
 
 	desc = pscrpc_new_bulk(npages, type, portal);
 	if (desc == NULL)
@@ -295,9 +295,9 @@ pscrpc_set_remove_req_locked(struct pscrpc_request_set *set,
 	psclist_del(&req->rq_set_chain_lentry, &set->set_requests);
 	req->rq_set = NULL;
 	if (req->rq_phase != PSCRPC_RQ_PHASE_COMPLETE) {
-		psc_assert(set->set_remaining > 0);
+		pfl_assert(set->set_remaining > 0);
 		set->set_remaining--;
-		psc_assert(atomic_read(&req->rq_import->imp_inflight) > 0);
+		pfl_assert(atomic_read(&req->rq_import->imp_inflight) > 0);
 		atomic_dec(&req->rq_import->imp_inflight);
 	}
 }
@@ -356,7 +356,7 @@ pscrpc_send_new_req_locked(struct pscrpc_request *req)
 	LOCK_ENSURE(&req->rq_lock);
 	DEBUG_REQ(PLL_DIAG, req, buf, "about to send rpc");
 
-	psc_assert(req->rq_phase == PSCRPC_RQ_PHASE_NEW);
+	pfl_assert(req->rq_phase == PSCRPC_RQ_PHASE_NEW);
 	req->rq_phase = PSCRPC_RQ_PHASE_RPC;
 	freelock(&req->rq_lock);
 
@@ -450,7 +450,7 @@ pscrpc_unregister_reply(struct pscrpc_request *request)
 	char buf[PSCRPC_NIDSTR_SIZE];
 	int rc;
 
-	psc_assert(!in_interrupt());             /* might sleep */
+	pfl_assert(!in_interrupt());             /* might sleep */
 
 	DEBUG_REQ(PLL_DIAG, request, buf, "receving_reply=%d",
 	    pscrpc_client_receiving_reply(request));
@@ -477,7 +477,7 @@ pscrpc_unregister_reply(struct pscrpc_request *request)
 		if (rc == 0)
 			return;
 
-		psc_assert(rc == -ETIMEDOUT);
+		pfl_assert(rc == -ETIMEDOUT);
 		DEBUG_REQ(PLL_ERROR, request, buf, "Unexpectedly long timeout");
 		//abort();
 	}
@@ -514,7 +514,7 @@ after_reply(struct pscrpc_request *req)
 	char buf[PSCRPC_NIDSTR_SIZE];
 	int rc;
 
-	psc_assert(!req->rq_receiving_reply);
+	pfl_assert(!req->rq_receiving_reply);
 
 	/* NB Until this point, the whole of the incoming message,
 	 * including buflens, status etc is in the sender's byte order. */
@@ -523,7 +523,7 @@ after_reply(struct pscrpc_request *req)
 	/* Clear reply swab mask; this is a new reply in sender's byte order */
 	req->rq_rep_swab_mask = 0;
 #endif
-	psc_assert(req->rq_nob_received <= req->rq_replen);
+	pfl_assert(req->rq_nob_received <= req->rq_replen);
 	rc = pscrpc_unpack_msg(req->rq_repmsg, req->rq_nob_received);
 	if (rc) {
 		DEBUG_REQ(PLL_ERROR, req, buf, "unpack_rep failed: %d", rc);
@@ -563,11 +563,11 @@ pscrpc_queue_wait(struct pscrpc_request *req)
 	struct l_wait_info lwi;
 	char buf[PSCRPC_NIDSTR_SIZE];
 
-	psc_assert(req->rq_set == NULL);
-	psc_assert(!req->rq_receiving_reply);
+	pfl_assert(req->rq_set == NULL);
+	pfl_assert(!req->rq_receiving_reply);
 	atomic_inc(&imp->imp_inflight);
 
-	psc_assert(imp);
+	pfl_assert(imp);
 	DEBUG_REQ(PLL_DIAG, req, buf, "sending..");
 
 	/* Mark phase here for a little debug help */
@@ -577,7 +577,7 @@ pscrpc_queue_wait(struct pscrpc_request *req)
 	if (req->rq_resend) {
 		DEBUG_REQ(PLL_WARN, req, buf, "resending (receiving_reply=%d)",
 			  req->rq_receiving_reply);
-		psc_assert(!req->rq_no_resend);
+		pfl_assert(!req->rq_no_resend);
 
 		if (req->rq_compl)
 			/*
@@ -639,7 +639,7 @@ pscrpc_queue_wait(struct pscrpc_request *req)
 		GOTO(out, 0);
 
 	if (req->rq_err) {
-		psc_assert(req->rq_status);
+		pfl_assert(req->rq_status);
 		GOTO(out, rc = req->rq_status);
 	}
 
@@ -700,9 +700,9 @@ pscrpc_queue_wait(struct pscrpc_request *req)
 			brc = pscrpc_cli_wait_event(&req->rq_reply_waitq,
 			    !pscrpc_bulk_active(req->rq_bulk),
 			    &lwi);
-			psc_assert(brc == 0 || brc == -ETIMEDOUT);
+			pfl_assert(brc == 0 || brc == -ETIMEDOUT);
 			if (brc) {
-				psc_assert(brc == -ETIMEDOUT);
+				pfl_assert(brc == -ETIMEDOUT);
 				DEBUG_REQ(PLL_ERROR, req, buf, "bulk timed out");
 				rc = brc;
 			} else if (!req->rq_bulk->bd_success) {
@@ -716,7 +716,7 @@ pscrpc_queue_wait(struct pscrpc_request *req)
 			pscrpc_unregister_bulk(req);
 	}
 
-	psc_assert(!req->rq_receiving_reply);
+	pfl_assert(!req->rq_receiving_reply);
 	req->rq_phase = PSCRPC_RQ_PHASE_INTERPRET;
 
 	atomic_dec(&imp->imp_inflight);
@@ -833,9 +833,9 @@ _pscrpc_set_check(struct pscrpc_request_set *set, int finish_one)
 				status = expired_request(req);
 
 				if (status) {
-					psc_assert(req->rq_status);
-					psc_assert(req->rq_err);
-					psc_assert(req->rq_timedout);
+					pfl_assert(req->rq_status);
+					pfl_assert(req->rq_err);
+					pfl_assert(req->rq_timedout);
 					goto handle_error;
 				}
 			}
@@ -924,7 +924,7 @@ _pscrpc_set_check(struct pscrpc_request_set *set, int finish_one)
 			GOTO(interpret, req->rq_status);
 		}
 
-		psc_assert(req->rq_phase == PSCRPC_RQ_PHASE_BULK);
+		pfl_assert(req->rq_phase == PSCRPC_RQ_PHASE_BULK);
 		if (pscrpc_bulk_active(req->rq_bulk))
 			continue;
 
@@ -940,8 +940,8 @@ _pscrpc_set_check(struct pscrpc_request_set *set, int finish_one)
 		req->rq_phase = PSCRPC_RQ_PHASE_INTERPRET;
 
  interpret:
-		psc_assert(req->rq_phase == PSCRPC_RQ_PHASE_INTERPRET);
-		psc_assert(!req->rq_receiving_reply);
+		pfl_assert(req->rq_phase == PSCRPC_RQ_PHASE_INTERPRET);
+		pfl_assert(!req->rq_receiving_reply);
 
 		pscrpc_unregister_reply(req);
 		if (req->rq_bulk)
@@ -997,18 +997,18 @@ pscrpc_set_destroy(struct pscrpc_request_set *set)
 	expected_phase = (set->set_remaining == 0) ?
 	    PSCRPC_RQ_PHASE_COMPLETE : PSCRPC_RQ_PHASE_NEW;
 	psclist_for_each_entry(req, &set->set_requests, rq_set_chain_lentry) {
-		psc_assert(req->rq_phase == expected_phase);
+		pfl_assert(req->rq_phase == expected_phase);
 		n++;
 	}
 
-	psc_assert(set->set_remaining == 0 || set->set_remaining == n);
+	pfl_assert(set->set_remaining == 0 || set->set_remaining == n);
 
 	psclist_for_each_entry_safe(req, next, &set->set_requests,
 	    rq_set_chain_lentry) {
 		psclist_del(&req->rq_set_chain_lentry,
 		    &set->set_requests);
 
-		psc_assert(req->rq_phase == expected_phase);
+		pfl_assert(req->rq_phase == expected_phase);
 
 		if (req->rq_phase == PSCRPC_RQ_PHASE_NEW) {
 			req->rq_status = -EBADR;
@@ -1022,8 +1022,8 @@ pscrpc_set_destroy(struct pscrpc_request_set *set)
 		pscrpc_req_finished(req);
 	}
 
-	psc_assert(set->set_remaining == 0);
-	psc_assert(psc_waitq_nwaiters(&set->set_waitq) == 0);
+	pfl_assert(set->set_remaining == 0);
+	pfl_assert(psc_waitq_nwaiters(&set->set_waitq) == 0);
 	psc_waitq_destroy(&set->set_waitq);
 	psc_compl_destroy(&set->set_compl);
 
@@ -1041,9 +1041,9 @@ pscrpc_expire_one_request(struct pscrpc_request *req, int force)
 	char buf[512];
 	struct pscrpc_import *imp = req->rq_import;
 
-	psc_assert(imp);
+	pfl_assert(imp);
 
-	psc_assert(req->rq_send_state == PSCRPC_IMP_NOOP);
+	pfl_assert(req->rq_send_state == PSCRPC_IMP_NOOP);
 
 	spinlock(&req->rq_lock);
 	req->rq_retries++;
@@ -1081,7 +1081,7 @@ pscrpc_expired_set(void *data)
 	struct pscrpc_request *req;
 	time_t now = CURRENT_SECONDS;
 
-	psc_assert(set);
+	pfl_assert(set);
 
 	/* A timeout expired; see which reqs it applies to... */
 	psclist_for_each_entry(req, &set->set_requests, rq_set_chain_lentry) {
@@ -1147,7 +1147,7 @@ pscrpc_interrupted_set(void *data)
 	struct pscrpc_request_set *set = data;
 	struct pscrpc_request *req;
 
-	psc_assert(set);
+	pfl_assert(set);
 	CERROR("INTERRUPTED SET %p", set);
 
 	psclist_for_each_entry(req, &set->set_requests, rq_set_chain_lentry) {
@@ -1166,7 +1166,7 @@ pscrpc_import_delay_req(struct pscrpc_import *imp,
 	int delay = 0;
 	char buf[PSCRPC_NIDSTR_SIZE];
 
-	psc_assert(status);
+	pfl_assert(status);
 	*status = 0;
 
 	if (imp->imp_state == PSCRPC_IMP_NEW) {
@@ -1228,7 +1228,7 @@ pscrpc_set_wait(struct pscrpc_request_set *set)
 		rc = pscrpc_cli_wait_event(&set->set_waitq,
 		    pscrpc_set_check(set), &lwi);
 
-		psc_assert(rc == 0 || rc == -EINTR || rc == -ETIMEDOUT);
+		pfl_assert(rc == 0 || rc == -EINTR || rc == -ETIMEDOUT);
 
 		/*
 		 * -EINTR => all requests have been flagged rq_intr so next
@@ -1241,7 +1241,7 @@ pscrpc_set_wait(struct pscrpc_request_set *set)
 		 */
 	} while (rc || set->set_remaining);
 
-	psc_assert(set->set_remaining == 0);
+	pfl_assert(set->set_remaining == 0);
 
 	rc = 0;
 	psclist_for_each_entry(req, &set->set_requests, rq_set_chain_lentry) {
@@ -1255,7 +1255,7 @@ pscrpc_set_wait(struct pscrpc_request_set *set)
 		}
 #endif
 
-		psc_assert(req->rq_phase == PSCRPC_RQ_PHASE_COMPLETE);
+		pfl_assert(req->rq_phase == PSCRPC_RQ_PHASE_COMPLETE);
 
 		if (req->rq_status && !rc) {
 			rc = -abs(req->rq_status);
@@ -1318,7 +1318,7 @@ pscrpc_free_committed(struct pscrpc_import *imp)
 	struct pscrpc_request *req;
 	struct pscrpc_request *last_req = NULL; /* temporary fire escape */
 
-	psc_assert(imp);
+	pfl_assert(imp);
 
 	LOCK_ENSURE(&imp->imp_lock);
 
@@ -1339,7 +1339,7 @@ pscrpc_free_committed(struct pscrpc_import *imp)
 		req = psc_lentry_obj(tmp, struct pscrpc_request, rq_replay_list);
 
 		/* XXX ok to remove when 1357 resolved - rread 05/29/03  */
-		psc_assert(req != last_req);
+		pfl_assert(req != last_req);
 		last_req = req;
 
 		if (req->rq_import_generation < imp->imp_generation) {

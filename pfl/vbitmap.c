@@ -105,7 +105,7 @@ psc_vbitmap_setval(struct psc_vbitmap *vb, size_t pos, int set)
 	size_t shft, bytes;
 	int oldval;
 
-	psc_assert(pos < psc_vbitmap_getsize(vb));
+	pfl_assert(pos < psc_vbitmap_getsize(vb));
 
 	bytes = pos / NBBY;
 	shft = pos % NBBY;
@@ -178,7 +178,7 @@ psc_vbitmap_get(const struct psc_vbitmap *vb, size_t pos)
 {
 	size_t shft, bytes;
 
-	psc_assert(pos < psc_vbitmap_getsize(vb));
+	pfl_assert(pos < psc_vbitmap_getsize(vb));
 
 	bytes = pos / NBBY;
 	shft = pos % NBBY;
@@ -263,9 +263,9 @@ pfl_vbitmap_israngeset(struct psc_vbitmap *vb, int val,
 		return (1);
 
 	fv = val ? 0xff : 0;
-	psc_assert(start < psc_vbitmap_getsize(vb));
-	psc_assert(start + len > start);
-	psc_assert(start + len <= psc_vbitmap_getsize(vb));
+	pfl_assert(start < psc_vbitmap_getsize(vb));
+	pfl_assert(start + len > start);
+	pfl_assert(start + len <= psc_vbitmap_getsize(vb));
 	p = vb->vb_start;
 	p += start / NBBY;
 	adj = start & 7;
@@ -291,7 +291,7 @@ pfl_vbitmap_israngeset(struct psc_vbitmap *vb, int val,
 	if (len == 0)
 		return (1);
 
-	psc_assert(len <= 8);
+	pfl_assert(len <= 8);
 
 	/* Check last byte. */
 	if (fv) {
@@ -446,7 +446,7 @@ psc_vbitmap_next(struct psc_vbitmap *vb, size_t *elem)
 void
 psc_vbitmap_setnextpos(struct psc_vbitmap *vb, size_t pos)
 {
-	psc_assert(pos < psc_vbitmap_getsize(vb));
+	pfl_assert(pos < psc_vbitmap_getsize(vb));
 	vb->vb_pos = vb->vb_start + pos / NBBY;
 }
 
@@ -546,7 +546,7 @@ pfl_vbitmap_getabbrbinstring(const struct psc_vbitmap *vb)
 				if (runlen > 3) {
 					n = snprintf(t, len - (t - str),
 					    ":%d,", runlen);
-					psc_assert(n != -1);
+					pfl_assert(n != -1);
 					t += n;
 				}
 				runlen = 0;
@@ -559,7 +559,7 @@ pfl_vbitmap_getabbrbinstring(const struct psc_vbitmap *vb)
 	if (runlen) {
 		*t++ = lastval ? '1' : '0';
 		n = snprintf(t, len - (t - str), ":%d,", runlen);
-		psc_assert(n != -1);
+		pfl_assert(n != -1);
 		t += n;
 	}
 	for (i = 0; i < vb->vb_lastsize && t - str < len; i++)

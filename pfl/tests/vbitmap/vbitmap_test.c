@@ -72,9 +72,9 @@
 
 #define CHECK_RANGE(vb, val, off, len)					\
 	do {								\
-		psc_assert(pfl_vbitmap_israngeset((vb), (val), (off),	\
+		pfl_assert(pfl_vbitmap_israngeset((vb), (val), (off),	\
 		    (len)) == 1);					\
-		psc_assert(pfl_vbitmap_israngeset((vb), !(val), (off),	\
+		pfl_assert(pfl_vbitmap_israngeset((vb), !(val), (off),	\
 		    (len)) == 0);					\
 	} while (0)
 
@@ -119,27 +119,27 @@ main(int argc, char *argv[])
 	psc_vbitmap_setrange(vb, 13, 9);
 	psc_vbitmap_printbin1(vb);
 	for (i = 0; i < 13; i++)
-		psc_assert(psc_vbitmap_get(vb, i) == 0);
+		pfl_assert(psc_vbitmap_get(vb, i) == 0);
 	for (j = 0; j < 9; j++, i++)
-	    psc_assert(psc_vbitmap_get(vb, i) == 1);
+	    pfl_assert(psc_vbitmap_get(vb, i) == 1);
 	for (j = 0; j < 25; j++, i++)
-	    psc_assert(psc_vbitmap_get(vb, i) == 0);
+	    pfl_assert(psc_vbitmap_get(vb, i) == 0);
 
 	psc_vbitmap_clearall(vb);
 	for (i = 0; i < 213; i++)
-	    psc_assert(psc_vbitmap_get(vb, i) == 0);
+	    pfl_assert(psc_vbitmap_get(vb, i) == 0);
 
 	psc_vbitmap_setrange(vb, 25, 3);
 	for (i = 0; i < 25; i++)
-		psc_assert(psc_vbitmap_get(vb, i) == 0);
+		pfl_assert(psc_vbitmap_get(vb, i) == 0);
 	for (j = 0; j < 3; j++, i++)
-	    psc_assert(psc_vbitmap_get(vb, i) == 1);
+	    pfl_assert(psc_vbitmap_get(vb, i) == 1);
 	for (j = 0; j < 25; j++, i++)
-	    psc_assert(psc_vbitmap_get(vb, i) == 0);
+	    pfl_assert(psc_vbitmap_get(vb, i) == 0);
 
 	psc_vbitmap_clearall(vb);
 	for (i = 0; i < 213; i++)
-	    psc_assert(psc_vbitmap_get(vb, i) == 0);
+	    pfl_assert(psc_vbitmap_get(vb, i) == 0);
 
 	for (i = 0; i < 213; i++)
 		if (!psc_vbitmap_next(vb, &elem))
@@ -154,16 +154,16 @@ main(int argc, char *argv[])
 
 	psc_vbitmap_unsetrange(vb, 13, 2);
 	for (i = 0; i < 13; i++)
-		psc_assert(psc_vbitmap_get(vb, i) == 1);
+		pfl_assert(psc_vbitmap_get(vb, i) == 1);
 	for (j = 0; j < 2; j++, i++)
-	    psc_assert(psc_vbitmap_get(vb, i) == 0);
+	    pfl_assert(psc_vbitmap_get(vb, i) == 0);
 	for (j = 0; j < 25; j++, i++)
-	    psc_assert(psc_vbitmap_get(vb, i) == 1);
+	    pfl_assert(psc_vbitmap_get(vb, i) == 1);
 
 	if (psc_vbitmap_resize(vb, NELEM) == -1)
 		psc_fatal("psc_vbitmap_resize");
 
-	psc_assert(psc_vbitmap_getsize(vb) == NELEM);
+	pfl_assert(psc_vbitmap_getsize(vb) == NELEM);
 
 	/* fill up bitmap */
 	for (i = 0; i < NELEM - 211; i++)
@@ -203,22 +203,22 @@ main(int argc, char *argv[])
 	psc_vbitmap_setval_range(vb, 0, NELEM, 0);
 	CHECK_RANGE(vb, 0, 581, 371);
 	CHECK_RANGE(vb, 0, 581, 1);
-	psc_assert(pfl_vbitmap_isempty(vb));
+	pfl_assert(pfl_vbitmap_isempty(vb));
 
 	psc_vbitmap_setval_range(vb, 0, NELEM, 1);
 	CHECK_RANGE(vb, 1, 581, 371);
 	CHECK_RANGE(vb, 1, 581, 1);
-	psc_assert(psc_vbitmap_isfull(vb));
+	pfl_assert(psc_vbitmap_isfull(vb));
 
 	psc_vbitmap_free(vb);
 
 	vb = psc_vbitmap_newf(0, PVBF_AUTO);
-	psc_assert(vb);
-	psc_assert(pfl_vbitmap_isempty(vb));
-	psc_assert(psc_vbitmap_getsize(vb) == 0);
-	psc_assert(psc_vbitmap_resize(vb, 6) == 0);
-	psc_assert(psc_vbitmap_getsize(vb) == 6);
-	psc_assert(pfl_vbitmap_isempty(vb));
+	pfl_assert(vb);
+	pfl_assert(pfl_vbitmap_isempty(vb));
+	pfl_assert(psc_vbitmap_getsize(vb) == 0);
+	pfl_assert(psc_vbitmap_resize(vb, 6) == 0);
+	pfl_assert(psc_vbitmap_getsize(vb) == 6);
+	pfl_assert(pfl_vbitmap_isempty(vb));
 	psc_vbitmap_free(vb);
 
 	vb = psc_vbitmap_newf(0, PVBF_AUTO);
@@ -232,7 +232,7 @@ main(int argc, char *argv[])
 	CHECK_RANGE(vb, 1, 2, 4);
 
 	psc_vbitmap_clearall(vb);
-	psc_assert(psc_vbitmap_setval_range(vb, 2, 4, 1) == 0);
+	pfl_assert(psc_vbitmap_setval_range(vb, 2, 4, 1) == 0);
 	CHECK_RANGE(vb, 1, 2, 4);
 	ENSURE(vb, "001111");
 	psc_vbitmap_free(vb);
@@ -242,7 +242,7 @@ main(int argc, char *argv[])
 		if (psc_vbitmap_resize(vb, i) == -1)
 			psc_fatal("psc_vbitmap_new");
 		psc_vbitmap_setval(vb, i - 1, i % 2);
-		psc_assert(psc_vbitmap_get(vb, i - 1) == i % 2);
+		pfl_assert(psc_vbitmap_get(vb, i - 1) == i % 2);
 	}
 	psc_vbitmap_free(vb);
 
@@ -265,7 +265,7 @@ main(int argc, char *argv[])
 	}
 
 	vb = psc_vbitmap_new(8200);
-	psc_assert(pfl_vbitmap_isempty(vb));
+	pfl_assert(pfl_vbitmap_isempty(vb));
 	CHECK_RANGE(vb, 0, 8, 8192);
 	psc_vbitmap_free(vb);
 
@@ -282,17 +282,17 @@ main(int argc, char *argv[])
 
 	vb = psc_vbitmap_new(16);
 	ENSURE(vb, "0000000000000000");
-	psc_assert(pfl_vbitmap_isempty(vb));
+	pfl_assert(pfl_vbitmap_isempty(vb));
 	CHECK_RANGE(vb, 0, 8, 8);
 	CHECK_RANGE(vb, 0, 9, 7);
 	psc_vbitmap_setval(vb, 15, 1);
 	ENSURE(vb, "0000000000000001");
 	CHECK_RANGE(vb, 0, 9, 6);
 	CHECK_RANGE(vb, 1, 15, 1);
-	psc_assert(pfl_vbitmap_israngeset(vb, 0, 8, 8) == 0);
-	psc_assert(pfl_vbitmap_israngeset(vb, 1, 8, 8) == 0);
+	pfl_assert(pfl_vbitmap_israngeset(vb, 0, 8, 8) == 0);
+	pfl_assert(pfl_vbitmap_israngeset(vb, 1, 8, 8) == 0);
 	psc_vbitmap_clearall(vb);
-	psc_assert(pfl_vbitmap_isempty(vb));
+	pfl_assert(pfl_vbitmap_isempty(vb));
 	psc_vbitmap_free(vb);
 
 	exit(0);

@@ -68,7 +68,7 @@ struct psc_thread_init {
 static inline struct name *						\
 label(struct psc_thread *pt)						\
 {									\
-	psc_assert(pt->pscthr_type == (type));				\
+	pfl_assert(pt->pscthr_type == (type));				\
 	return (pt->pscthr_private);					\
 }
 

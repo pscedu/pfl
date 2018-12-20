@@ -572,7 +572,7 @@ pflnet_getifnfordst(const struct ifaddrs *ifa0,
 	const struct sockaddr_in *sin;
 	const struct ifaddrs *ifa;
 
-	psc_assert(sa->sa_family == AF_INET);
+	pfl_assert(sa->sa_family == AF_INET);
 	sin = (void *)sa;
 
 	/*

@@ -68,35 +68,35 @@ main(int argc, char *argv[])
 
 	p = (void *)(uintptr_t)0;
 	pos = bsearch_floor(p, a, nitems(a), sizeof(a[0]), cmp);
-	psc_assert(a[pos] == 0);
+	pfl_assert(a[pos] == 0);
 
 	p = (void *)(uintptr_t)1;
 	pos = bsearch_floor(p, a, nitems(a), sizeof(a[0]), cmp);
-	psc_assert(a[pos] == 0);
+	pfl_assert(a[pos] == 0);
 
 	p = (void *)(uintptr_t)1023;
 	pos = bsearch_floor(p, a, nitems(a), sizeof(a[0]), cmp);
-	psc_assert(a[pos] == 0);
+	pfl_assert(a[pos] == 0);
 
 	p = (void *)(uintptr_t)1024;
 	pos = bsearch_floor(p, a, nitems(a), sizeof(a[0]), cmp);
-	psc_assert(a[pos] == 1024);
+	pfl_assert(a[pos] == 1024);
 
 	p = (void *)(uintptr_t)1025;
 	pos = bsearch_floor(p, a, nitems(a), sizeof(a[0]), cmp);
-	psc_assert(a[pos] == 1024);
+	pfl_assert(a[pos] == 1024);
 
 	p = (void *)(uintptr_t)8191;
 	pos = bsearch_floor(p, a, nitems(a), sizeof(a[0]), cmp);
-	psc_assert(a[pos] == 4096);
+	pfl_assert(a[pos] == 4096);
 
 	p = (void *)(uintptr_t)8192;
 	pos = bsearch_floor(p, a, nitems(a), sizeof(a[0]), cmp);
-	psc_assert(a[pos] == 8192);
+	pfl_assert(a[pos] == 8192);
 
 	p = (void *)(uintptr_t)99999999999;
 	pos = bsearch_floor(p, a, nitems(a), sizeof(a[0]), cmp);
-	psc_assert(a[pos] == 8192);
+	pfl_assert(a[pos] == 8192);
 
 	exit(0);
 }

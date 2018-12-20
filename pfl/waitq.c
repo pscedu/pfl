@@ -70,7 +70,7 @@ psc_waitq_destroy(struct psc_waitq *q)
 {
 	int rc;
 
-	psc_assert(q->wq_nwaiters == 0);
+	pfl_assert(q->wq_nwaiters == 0);
 
 	psc_mutex_destroy(&q->wq_mut);
 	rc = pthread_cond_destroy(&q->wq_cond);

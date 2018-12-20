@@ -258,8 +258,8 @@ pscrpc_new_import(void)
 struct pscrpc_import *
 pscrpc_import_get(struct pscrpc_import *import)
 {
-	psc_assert(atomic_read(&import->imp_refcount) >= 0);
-	psc_assert(atomic_read(&import->imp_refcount) < 0x5a5a5a);
+	pfl_assert(atomic_read(&import->imp_refcount) >= 0);
+	pfl_assert(atomic_read(&import->imp_refcount) < 0x5a5a5a);
 	atomic_inc(&import->imp_refcount);
 	psclog_diag("import get %p refcount=%d", import,
 	    atomic_read(&import->imp_refcount));
@@ -272,14 +272,14 @@ pscrpc_import_put(struct pscrpc_import *import)
 	psclog_diag("import put %p refcount=%d", import,
 	    atomic_read(&import->imp_refcount) - 1);
 
-	psc_assert(atomic_read(&import->imp_refcount) > 0);
-	psc_assert(atomic_read(&import->imp_refcount) < 0x5a5a5a);
+	pfl_assert(atomic_read(&import->imp_refcount) > 0);
+	pfl_assert(atomic_read(&import->imp_refcount) < 0x5a5a5a);
 	if (!atomic_dec_and_test(&import->imp_refcount))
 		return;
 	psclog_diag("destroying import %p", import);
 
 	/* XXX what if we fail to establish a connect for a new import */
-	psc_assert(import->imp_connection);
+	pfl_assert(import->imp_connection);
 	pscrpc_put_connection(import->imp_connection);
 	psc_waitq_destroy(&import->imp_recovery_waitq);
 	psc_pool_return(pscrpc_imp_pool, import);

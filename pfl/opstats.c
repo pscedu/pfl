@@ -65,7 +65,7 @@ pfl_opstat_initf(int flags, const char *namefmt, ...)
 	if (pos < psc_dynarray_len(&pfl_opstats)) {
 		opst = psc_dynarray_getpos(&pfl_opstats, pos);
 		if (strcmp(name, opst->opst_name) == 0) {
-			psc_assert((flags & OPSTF_EXCL) == 0);
+			pfl_assert((flags & OPSTF_EXCL) == 0);
 			freelock(&pfl_opstats_lock);
 			return (opst);
 		}
@@ -98,7 +98,7 @@ pfl_opstat_destroy(struct pfl_opstat *opst)
 	spinlock(&pfl_opstats_lock);
 	pos = psc_dynarray_bsearch(&pfl_opstats, opst->opst_name,
 	    _pfl_opstat_cmp);
-	psc_assert(psc_dynarray_getpos(&pfl_opstats, pos) == opst);
+	pfl_assert(psc_dynarray_getpos(&pfl_opstats, pos) == opst);
 	pfl_opstat_destroy_pos(pos);
 	freelock(&pfl_opstats_lock);
 }
@@ -133,9 +133,9 @@ pfl_opstats_grad_init(struct pfl_opstats_grad *og, int flags,
 
 	for (i = 0, ob = og->og_buckets; i < nbuckets; i++, ob++) {
 		if (i)
-			psc_assert(buckets[i - 1] < buckets[i]);
+			pfl_assert(buckets[i - 1] < buckets[i]);
 		else
-			psc_assert(buckets[i] == 0);
+			pfl_assert(buckets[i] == 0);
 
 		lower_bound = buckets[i];
 		if (!(flags & OPSTF_BASE10))

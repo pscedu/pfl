@@ -74,7 +74,7 @@ pscrpc_get_connection(lnet_process_id_t peer, lnet_nid_t self,
 	struct pscrpc_connection *c, *c2;
 	struct psc_hashbkt *b;
 
-//	psc_assert(uuid);
+//	pfl_assert(uuid);
 
 	psclog_debug("self %s peer %s",
 	    libcfs_nid2str(self), libcfs_id2str(peer));
@@ -128,7 +128,7 @@ pscrpc_put_connection(struct pscrpc_connection *c)
 
 	n = psc_atomic32_dec_getnew(&c->c_refcount);
 
-	psc_assert(n >= 0);
+	pfl_assert(n >= 0);
 
 	psclog_debug("connection=%p refcount %d to %s",
 	    c, n, libcfs_nid2str(c->c_peer.nid));

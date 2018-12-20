@@ -239,7 +239,7 @@ pscfs_fuse_new(void)
 	 *
 	 * Receive fuse_fs_info_t from pscfs_fuse_newfs().
 	 */
-	psc_assert(fd_read_loop(pflfs_fds[0].fd, &fs,
+	pfl_assert(fd_read_loop(pflfs_fds[0].fd, &fs,
 	    sizeof(fuse_fs_info_t)) == 0);
 
 	char *mntpoint = PSCALLOC(fs.mntlen + 1);
@@ -248,7 +248,7 @@ pscfs_fuse_new(void)
 		return;
 	}
 
-	psc_assert(fd_read_loop(pflfs_fds[0].fd, mntpoint, fs.mntlen) == 0);
+	pfl_assert(fd_read_loop(pflfs_fds[0].fd, mntpoint, fs.mntlen) == 0);
 
 	mntpoint[fs.mntlen] = '\0';
 
@@ -350,7 +350,7 @@ pscfs_fuse_listener_loop(__unusedx struct psc_thread *thr)
 
 			pflfs_fds[i].revents = 0;
 
-			psc_assert((rev & POLLNVAL) == 0);
+			pfl_assert((rev & POLLNVAL) == 0);
 
 			if (!(rev & POLLIN) &&
 			    !(rev & POLLERR) && !(rev & POLLHUP))
@@ -867,7 +867,7 @@ _pfr_decref(const struct pfl_callerinfo *pci, struct pscfs_req *pfr, int rc)
 	spinlock_pci(pci, &pfr->pfr_lock);
 	if (pfr->pfr_rc == 0 && rc)
 		pfr->pfr_rc = rc;
-	psc_assert(pfr->pfr_refcnt > 0);
+	pfl_assert(pfr->pfr_refcnt > 0);
 	PFLOG_PFR(PLL_DEBUG, pfr, "decref");
 	if (--pfr->pfr_refcnt) {
 		freelock(&pfr->pfr_lock);

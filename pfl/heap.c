@@ -44,7 +44,7 @@ pfl_heap_add(struct pfl_heap *ph, void *c)
 	size_t nalloc;
 	void *p;
 
-	psc_assert(c);
+	pfl_assert(c);
 	che = PSC_AGP(c, ph->ph_entoff);
 	if (ph->ph_nitems == ph->ph_nalloc) {
 		nalloc = MAX(8, 2 * ph->ph_nalloc);
@@ -70,9 +70,9 @@ pfl_heap_remove(struct pfl_heap *ph, void *p)
 	void *c, *minc;
 	int idx, i;
 
-	psc_assert(ph->ph_nitems > 0);
+	pfl_assert(ph->ph_nitems > 0);
 
-	psc_assert(p);
+	pfl_assert(p);
 	phe = PSC_AGP(p, ph->ph_entoff);
 	p = ph->ph_base[idx = phe->phe_idx] =
 	    ph->ph_base[--ph->ph_nitems];
@@ -104,7 +104,7 @@ pfl_heap_peekidx(struct pfl_heap *ph, int idx)
 
 	p = ph->ph_base[idx];
 	phe = PSC_AGP(p, ph->ph_entoff);
-	psc_assert(phe->phe_idx == idx);
+	pfl_assert(phe->phe_idx == idx);
 	return (p);
 }
 

@@ -140,7 +140,7 @@ pfl_odt_write(struct pfl_odt *t, const void *p,
 	h = t->odt_hdr;
 
 	pad = h->odth_slotsz - h->odth_itemsz - sizeof(*f);
-	psc_assert(!pad);
+	pfl_assert(!pad);
 
 	pfl_odt_zerobuf_ensurelen(pad);
 
@@ -160,7 +160,7 @@ pfl_odt_write(struct pfl_odt *t, const void *p,
 		PACK_IOV(f, sizeof(*f));
 
 	rc = pwritev(t->odt_fd, iov, nio, off);
-	psc_assert(rc == expect);
+	pfl_assert(rc == expect);
 }
 
 void
@@ -178,7 +178,7 @@ pfl_odt_read(struct pfl_odt *t, int64_t n,
 
 	h = t->odt_hdr;
 	pad = h->odth_slotsz - h->odth_itemsz - sizeof(*f);
-	psc_assert(!pad);
+	pfl_assert(!pad);
 
 	pfl_odt_zerobuf_ensurelen(pad);
 
@@ -198,7 +198,7 @@ pfl_odt_read(struct pfl_odt *t, int64_t n,
 		PACK_IOV(f, sizeof(*f));
 
 	rc = preadv(t->odt_fd, iov, nio, off);
-	psc_assert(rc == expect);
+	pfl_assert(rc == expect);
 }
 
 /* See also slm_odtops */
@@ -223,7 +223,7 @@ _pfl_odt_doput(struct pfl_odt *t, int64_t item,
 	f->odtf_slotno = item;
 	psc_crc64_init(&f->odtf_crc);
 	if (inuse) {
-		psc_assert(p);
+		pfl_assert(p);
 		psc_crc64_add(&f->odtf_crc, p, h->odth_itemsz);
 	}
 	psc_crc64_add(&f->odtf_crc, f, sizeof(*f) - sizeof(f->odtf_crc));
@@ -302,7 +302,7 @@ pfl_odt_getslot(struct pfl_odt *t, int64_t n,
 	void **p = (void **)pp;
 
 	h = t->odt_hdr;
-	psc_assert(n <= h->odth_nitems - 1);
+	pfl_assert(n <= h->odth_nitems - 1);
 
 	if (p)
 		*p = PSCALLOC(h->odth_itemsz);
@@ -420,10 +420,10 @@ pfl_odt_load(struct pfl_odt **tp, struct pfl_odt_ops *odtops, int oflg,
 
 	psc_crc64_calc(&crc, t->odt_hdr, sizeof(*t->odt_hdr) -
 	    sizeof(t->odt_hdr->odth_crc));
-	psc_assert(h->odth_crc == crc);
+	pfl_assert(h->odth_crc == crc);
 
 	t->odt_bitmap = psc_vbitmap_newf(h->odth_nitems, PVBF_AUTO);
-	psc_assert(t->odt_bitmap);
+	pfl_assert(t->odt_bitmap);
 	/*
  	 * Skip the first slot, so that we can detect whether we have
  	 * assigned a lease easily.

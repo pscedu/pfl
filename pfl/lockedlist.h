@@ -139,7 +139,6 @@ void   pll_add_sorted(struct psc_lockedlist *, void *,
 void   pll_add_sorted_backwards(struct psc_lockedlist *, void *,
 	    int (*)(const void *, const void *));
 int    pll_conjoint(struct psc_lockedlist *, void *);
-int    pll_conjoint(struct psc_lockedlist *, void *);
 void *_pll_get(const struct pfl_callerinfo *, struct psc_lockedlist *, int);
 void  _pll_initf(struct psc_lockedlist *, int, psc_spinlock_t *, int);
 void  _pll_remove(const struct pfl_callerinfo *, struct psc_lockedlist *, void *);
@@ -150,14 +149,14 @@ void   pll_sort(struct psc_lockedlist *, void (*)(void *, size_t,
 static __inline struct psc_listentry *
 _pll_obj2entry(struct psc_lockedlist *pll, void *p)
 {
-	psc_assert(p);
+	pfl_assert(p);
 	return ((void *)((char *)p + pll->pll_offset));
 }
 
 static __inline void *
 _pll_entry2obj(struct psc_lockedlist *pll, struct psc_listentry *e)
 {
-	psc_assert(e);
+	pfl_assert(e);
 	return ((char *)e - pll->pll_offset);
 }
 

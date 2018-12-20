@@ -143,17 +143,17 @@ _psclist_add(struct psc_listentry *e, struct psc_listentry *prev,
     struct psc_listentry *next)
 {
 #if PFL_DEBUG
-	psc_assert(e->plh_owner == NULL);
-	psc_assert(prev->plh_owner && next->plh_owner);
-	psc_assert(prev->plh_owner == next->plh_owner);
+	pfl_assert(e->plh_owner == NULL);
+	pfl_assert(prev->plh_owner && next->plh_owner);
+	pfl_assert(prev->plh_owner == next->plh_owner);
 
-	psc_assert(e->plh_magic == PLENT_MAGIC);
-	psc_assert(prev->plh_magic == PLENT_MAGIC);
-	psc_assert(next->plh_magic == PLENT_MAGIC);
+	pfl_assert(e->plh_magic == PLENT_MAGIC);
+	pfl_assert(prev->plh_magic == PLENT_MAGIC);
+	pfl_assert(next->plh_magic == PLENT_MAGIC);
 
-	psc_assert(psc_lentry_prev(e) == NULL && psc_lentry_next(e) == NULL);
-	psc_assert(psc_lentry_prev(prev) && psc_lentry_next(prev));
-	psc_assert(psc_lentry_prev(next) && psc_lentry_next(next));
+	pfl_assert(psc_lentry_prev(e) == NULL && psc_lentry_next(e) == NULL);
+	pfl_assert(psc_lentry_prev(prev) && psc_lentry_next(prev));
+	pfl_assert(psc_lentry_prev(next) && psc_lentry_next(next));
 
 	e->plh_owner = prev->plh_owner;
 #endif
@@ -182,11 +182,11 @@ psclist_del(struct psclist_head *e, __unusedx const void *hd)
 	struct psc_listentry *prev, *next;
 
 #if PFL_DEBUG
-	psc_assert(e->plh_owner == hd);
-	psc_assert(e->plh_magic == PLENT_MAGIC);
-	psc_assert(psc_lentry_prev(e) && psc_lentry_next(e));
+	pfl_assert(e->plh_owner == hd);
+	pfl_assert(e->plh_magic == PLENT_MAGIC);
+	pfl_assert(psc_lentry_prev(e) && psc_lentry_next(e));
 	if (psc_lentry_prev(e) == psc_lentry_next(e))
-		psc_assert(psc_lentry_prev(e) == hd);
+		pfl_assert(psc_lentry_prev(e) == hd);
 #else
 	(void)hd;
 #endif
@@ -212,13 +212,13 @@ static __inline int
 psc_listhd_empty(const struct psclist_head *hd)
 {
 #if PFL_DEBUG
-	psc_assert(hd->plh_magic == PLENT_MAGIC);
-	psc_assert(hd->plh_owner == hd);
-	psc_assert(psc_listhd_first(hd) && psc_listhd_last(hd));
+	pfl_assert(hd->plh_magic == PLENT_MAGIC);
+	pfl_assert(hd->plh_owner == hd);
+	pfl_assert(psc_listhd_first(hd) && psc_listhd_last(hd));
 	if (psc_listhd_first(hd) == hd)
-		psc_assert(psc_listhd_last(hd) == hd);
+		pfl_assert(psc_listhd_last(hd) == hd);
 	if (psc_listhd_last(hd) == hd)
-		psc_assert(psc_listhd_first(hd) == hd);
+		pfl_assert(psc_listhd_first(hd) == hd);
 #endif
 	return (psc_listhd_first(hd) == hd);
 }
@@ -231,13 +231,13 @@ static __inline int
 psclist_disjoint(const struct psc_listentry *e)
 {
 #if PFL_DEBUG
-	psc_assert(e->plh_magic == PLENT_MAGIC);
+	pfl_assert(e->plh_magic == PLENT_MAGIC);
 	if (psc_lentry_prev(e))
-		psc_assert(psc_lentry_next(e) && e->plh_owner);
+		pfl_assert(psc_lentry_next(e) && e->plh_owner);
 	if (psc_lentry_next(e))
-		psc_assert(psc_lentry_prev(e) && e->plh_owner);
+		pfl_assert(psc_lentry_prev(e) && e->plh_owner);
 	if (e->plh_owner)
-		psc_assert(psc_lentry_prev(e) && psc_lentry_next(e));
+		pfl_assert(psc_lentry_prev(e) && psc_lentry_next(e));
 #endif
 	return (psc_lentry_prev(e) == NULL);
 }
@@ -255,19 +255,19 @@ _psclist_conjoint(const struct pfl_callerinfo *pci,
     const struct psc_listentry *e, const struct psclist_head *hd)
 {
 #if PFL_DEBUG
-	psc_assert(e->plh_magic == PLENT_MAGIC);
+	pfl_assert(e->plh_magic == PLENT_MAGIC);
 	if (hd == NULL) {
 		psclog_warnx("conjoint passed NULL");
 		hd = e->plh_owner;
 	}
 	if (psc_lentry_prev(e))
-		psc_assert(psc_lentry_next(e) && hd == e->plh_owner);
+		pfl_assert(psc_lentry_next(e) && hd == e->plh_owner);
 	if (psc_lentry_next(e))
-		psc_assert(psc_lentry_prev(e) && hd == e->plh_owner);
+		pfl_assert(psc_lentry_prev(e) && hd == e->plh_owner);
 	if (psc_lentry_prev(e) == psc_lentry_next(e) && psc_lentry_prev(e))
-		psc_assert(psc_lentry_prev(e) == (hd));
+		pfl_assert(psc_lentry_prev(e) == (hd));
 	if (e->plh_owner)
-		psc_assert(psc_lentry_prev(e) && psc_lentry_next(e));
+		pfl_assert(psc_lentry_prev(e) && psc_lentry_next(e));
 #else
 	(void)hd;
 	(void)pci;
@@ -340,16 +340,16 @@ _psclist_next_obj(struct psclist_head *hd, void *p,
 {
 	struct psc_listentry *e, *n;
 
-	psc_assert(p);
+	pfl_assert(p);
 	e = (void *)((char *)p + offset);
 
 	/*
 	 * Ensure integrity of entry: must be contained in
 	 * a list and must not inadvertenly be a head!
 	 */
-	psc_assert(psc_lentry_next(e) && psc_lentry_prev(e));
+	pfl_assert(psc_lentry_next(e) && psc_lentry_prev(e));
 	n = wantprev ? psc_lentry_prev(e) : psc_lentry_next(e);
-	psc_assert(n != e);
+	pfl_assert(n != e);
 	if (n == hd)
 		return (NULL);
 	return ((char *)n - offset);
@@ -520,7 +520,7 @@ psclist_add_sorted(struct psclist_head *hd, struct psc_listentry *e,
 {
 	struct psclist_head *t;
 
-	psc_assert(e);
+	pfl_assert(e);
 	psclist_for_each(t, hd)
 		if (cmpf((char *)e - offset, (char *)t - offset) < 0) {
 			psclist_add_before(e, t);
@@ -535,7 +535,7 @@ psclist_add_sorted_backwards(struct psclist_head *hd, struct psc_listentry *e,
 {
 	struct psclist_head *t;
 
-	psc_assert(e);
+	pfl_assert(e);
 	psclist_for_each_backwards(t, hd)
 		if (cmpf((char *)e - offset, (char *)t - offset) > 0) {
 			psclist_add_after(e, t);

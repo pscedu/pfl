@@ -291,17 +291,19 @@ struct pfl_logpoint {
 		goto label;						\
 	} while (0)
 
-#define psc_assert(cond)						\
+#define pfl_assert(cond)						\
 	do {								\
 		if (!(cond))						\
 			psc_fatalx("[assert] %s", #cond);		\
 	} while (0)
+#define psc_assert pfl_assert
 
-#define psc_assert_perror(cond)						\
+#define pfl_assert_perror(cond)						\
 	do {								\
 		if (!(cond))						\
 			psc_fatal("[assert] %s", #cond);		\
 	} while (0)
+#define psc_assert_perror pfl_assert_perror
 
 void	 psc_log_init(void);
 int	 psc_log_setfn(const char *, const char *);
