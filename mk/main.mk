@@ -105,6 +105,8 @@ PSCRPC_SRCS+=		${PFL_BASE}/service.c
 PSCRPC_SRCS+=		${PFL_BASE}/eqpollthr.c
 PSCRPC_SRCS+=		${PFL_BASE}/usklndthr.c
 
+LDFLAGS_DIRS=		$(filter -L%,${LDFLAGS})
+
 _TINCLUDES=		$(filter-out -I%,${INCLUDES}) $(patsubst %,-I%/,$(foreach \
 			dir,$(patsubst -I%,%,$(filter -I%,${INCLUDES})), $(realpath ${dir})))
 
@@ -124,20 +126,12 @@ EXTRACT_CFLAGS=		perl -ne 'print $$& while /-[^ID]\S+\s?/gc'
 
 # Process modules
 
-#
-# XXX Make this dependent on the value of PFL_DEBUG
-#
-#ifdef PICKLE_HAVE_FSANITIZE
-#  FSANITIZE_CFLAGS=	-fsanitize=address -fno-optimize-sibling-calls
-#  FSANITIZE_LDFLAGS=	-fsanitize=address
-#endif
-#
-
-LIBPFL=			-lpfl
-ifneq ($(filter pfl-whole,${MODULES}),)
-  MODULES+=		pfl
-  LIBPFL=		-Wl,-whole-archive -lpfl -Wl,-no-whole-archive
+ifdef PICKLE_HAVE_FSANITIZE
+  FSANITIZE_CFLAGS=	-fsanitize=address -fno-optimize-sibling-calls
+  FSANITIZE_LDFLAGS=	-fsanitize=address
 endif
+
+LIBPFL=		-lpfl
 
 ifneq ($(filter pfl,${MODULES}),)
   MODULES+=	pfl-hdrs str clock pthread
@@ -155,6 +149,7 @@ endif
 
 ifneq ($(filter pscfs,${MODULES}),)
   MODULES+=	pscfs-hdrs
+  SHLIB_FLAGS=	${BUNDLE_FLAGS}
   SRCS+=	${PFL_BASE}/fs.c
   SRCS+=	${PSCFS_SRCS}
 
@@ -445,10 +440,7 @@ endif
 ifdef SHLIB
   CFLAGS+=	-fPIC
   ${_TSHLIB}: ${OBJS}
-
-	# Put libraries at the end to deal with --as-needed.
-	 
-	${CC} -shared -o $@ $(sort ${OBJS}) ${LDFLAGS} 
+	${CC} ${SHLIB_FLAGS} -o $@ $(sort ${OBJS}) ${LDFLAGS}
 	@printf "%s" "${_TSHLIB}:" > ${DEPEND_FILE}
 	@${LIBDEP} ${LDFLAGS} ${LIBDEP_ADD} >> ${DEPEND_FILE}
 endif

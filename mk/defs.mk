@@ -73,25 +73,23 @@ ifeq ($(shell ${MINVER} ${LEXVER} 2.5.5 && echo 1),1)
 endif
 
 LFLAGS+=	-t
-
 YFLAGS+=	-d
 
-CFLAGS+=	-Wall -Wextra -pipe
-# -Wredundant-decls
+CFLAGS+=	-Wall -Wextra -pipe -Wredundant-decls
 CFLAGS+=	-Wshadow -fno-omit-frame-pointer
 LDFLAGS+=	-fno-omit-frame-pointer
 #CFLAGS+=	-Wno-address
 
 # Bits to enable Google profiler.
 ifeq (${GOPROF},1)
-CFLAGS+=	-fno-builtin-malloc -fno-builtin-calloc $( \
+  CFLAGS+=	-fno-builtin-malloc -fno-builtin-calloc $( \
 		) -fno-builtin-realloc -fno-builtin-free
-LDFLAGS+=	-ltcmalloc -lprofiler
+  LDFLAGS+=	-ltcmalloc -lprofiler
 endif
 
 # Bits to enable efence.
 ifeq (${EFENCE},1)
-LDFLAGS+=	-lefence
+  LDFLAGS+=	-lefence
 endif
 
 DEBUG?=		1
@@ -244,12 +242,21 @@ ifeq (${OSTYPE},Linux)
   DEFINES+=	-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
 endif
 
+SHARED_FLAGS?=	-shared
+BUNDLE_FLAGS?=	${SHARED_FLAGS}
+SHLIB_FLAGS?=	${SHARED_FLAGS}
+
 ifeq (${OSTYPE},Darwin)
+  BUNDLE_FLAGS=	-bundle -undefined dynamic_lookup
   DEFINES+=	-D_DARWIN_C_SOURCE -D_DARWIN_FEATURE_64_BIT_INODE
   DEFINES+=	-DHAVE_NO_POLL_DEV
   INCLUDES+=	-I/opt/local/include
-  CFLAGS+=	-Wno-deprecated-declarations
+  CFLAGS+=	-Wno-deprecated-declarations -Wno-address-of-packed-member
   THREAD_LIBS=	-lpthread
+
+  WHOLE_LIB_FLAGS=	-force_load $$(${LIBDEP} ${LDFLAGS_DIRS} $1)
+else
+  WHOLE_LIB_FLAGS=	-Wl,-whole-archive $1 -Wl,-no-whole-archive
 endif
 
 ifeq (${OSTYPE},OpenBSD)
