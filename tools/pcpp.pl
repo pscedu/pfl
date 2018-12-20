@@ -87,7 +87,6 @@ my $lvl = 0;
 my $foff;
 my $linenr = 0;
 my $pci;
-my $pci_sufx = "";
 
 sub advance {
 	my ($len) = @_;
@@ -141,9 +140,6 @@ sub get_func_args {
 	$pci = @av > 0 && $av[0] eq "const struct pfl_callerinfo *pci";
 	if ($pci) {
 		shift @av if $pci;
-		$pci_sufx = "_PCI";
-	} else {
-		$pci_sufx = "";
 	}
 	for (@av) {
 		# void (*foo)(const char *, int)
@@ -154,6 +150,7 @@ sub get_func_args {
 		}
 	}
 	pop @av if @av > 1 && $av[$#av] eq "...";
+	shift @av if $#av > 0 && $av[0] eq "PFL_CALLERINFO_ARG";
 	return @av;
 }
 
@@ -258,7 +255,6 @@ for ($i = 0; $i < length $data; ) {
 		my @args = get_func_args();
 		advance($plen);
 		advance($slen - 1);
-		print qq{_PFL_START_PCI(pci); } if $pci;
 		unless (get_containing_func() eq "main" or !$pfl) {
 			print qq{psclog_trace("enter %s};
 			my $endstr = "";
@@ -276,9 +272,7 @@ for ($i = 0; $i < length $data; ) {
 		$i += $-[1];
 		my $elen = $+[1] - $-[1];
 		if ($pfl) {
-			print "PFL_RETURNX$pci_sufx()";
-		} elsif ($pci) {
-			print "_PFL_RETURN_PCI()";
+			print "PFL_RETURNX()";
 		} else {
 			print "return";
 		}
@@ -292,9 +286,7 @@ for ($i = 0; $i < length $data; ) {
 		my $rvlen = $+[1] - $-[1];
 		my $elen = $+[2] - $-[2];
 		if ($pfl) {
-			print "PFL_RETURN_STR$pci_sufx("
-		} elsif ($pci) {
-			print "_PFL_RETURN_PCI(";
+			print "PFL_RETURN_STR("
 		} else {
 			print "return (";
 		}
@@ -310,9 +302,7 @@ for ($i = 0; $i < length $data; ) {
 		my $rvlen = $+[1] - $-[1];
 		my $elen = $+[2] - $-[2];
 		if ($pfl) {
-			print "PFL_RETURN_LIT$pci_sufx(";
-		} elsif ($pci) {
-			print "_PFL_RETURN_PCI(";
+			print "PFL_RETURN_LIT(";
 		} else {
 			print "return (";
 		}
@@ -341,9 +331,7 @@ for ($i = 0; $i < length $data; ) {
 		}
 
 		if ($pfl) {
-			print "$tag$pci_sufx(";
-		} elsif ($pci) {
-			print "_PFL_RETURN_PCI(";
+			print "$tag(";
 		} else {
 			print "return (";
 		}
@@ -387,9 +375,7 @@ for ($i = 0; $i < length $data; ) {
 					last if $hacks{yylex_return} and
 					    get_containing_tag eq "YY_DECL";
 					if ($pfl) {
-						print "PFL_RETURNX$pci_sufx();";
-					} elsif ($pci) {
-						print "_PFL_END_PCI();";
+						print "PFL_RETURNX();";
 					}
 					last;
 				}

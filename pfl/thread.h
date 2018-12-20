@@ -37,8 +37,6 @@
 
 #define PSC_THRNAME_MAX		  32				/* must be 8-byte aligned */
 
-extern psc_spinlock_t		  pthread_lock;
-
 struct psc_thread {
 	struct psclist_head	  pscthr_lentry;		/* list management */
 	pthread_t		  pscthr_pthread;		/* pthread_self() */
@@ -49,13 +47,13 @@ struct psc_thread {
 	char			 *pscthr_waitq;			/* debugging only */
 	char			  pscthr_name[PSC_THRNAME_MAX]; /* human readable name */
 	int			 *pscthr_loglevels;		/* logging granularity */
-	struct pfl_callerinfo	 *pscthr_callerinfo;
 	void			 *pscthr_private;		/* app-specific data */
 };
 
 struct psc_thread_init {
 	struct psc_thread	 *pti_thread;
-	void			(*pti_startf)(struct psc_thread *);	/* thread main */
+	void			(*pti_startf)(struct psc_thread *);
+								/* thread main */
 	int			  pti_memnid;			/* ID of memnode */
 };
 
@@ -76,7 +74,7 @@ label(struct psc_thread *pt)						\
 }
 
 /*
- * pscthr_init - Initialize an application thread.
+ * Initialize an application thread.
  */
 #define pscthr_init(thrtype, startf, privsiz, namefmt, ...)		\
 	_pscthr_init((thrtype), (startf), (privsiz), -1,		\

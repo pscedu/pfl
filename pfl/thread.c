@@ -65,7 +65,7 @@ struct psc_lockedlist		 psc_threads =
 #define	PTHREAD_STACK_SIZE	 (8 * 1024 * 1024)
 
 __static pthread_attr_t		 pthread_attr;
-__static psc_spinlock_t		 pthread_lock;
+__depr __static psc_spinlock_t	 pthread_lock;
 __static struct psc_waitq	 pthread_waitq;
 
 /*
@@ -93,7 +93,6 @@ _pscthr_destroy(void *arg)
 	PLL_ULOCK(&psc_threads);
 	/* crash below @40977 */
 	psc_free(thr->pscthr_loglevels, PAF_NOLOG);
-	psc_free(thr->pscthr_callerinfo, PAF_NOLOG);
 	psc_free(thr, PAF_NOLOG);
 }
 
@@ -183,6 +182,7 @@ pscthr_get(void)
 	struct psc_thread *thr;
 
 	thr = pscthr_get_canfail();
+	psc_assert(thr);
 	return (thr);
 }
 
@@ -225,13 +225,6 @@ _pscthr_finish_init(struct psc_thread_init *thr_init)
 	sa.sa_handler = _pscthr_unpause;
 	if (sigaction(SIGUSR2, &sa, NULL) == -1)
 		psc_fatal("sigaction");
-
-	/*
-	 * Do this allocation now instead during fatal() if malloc is
-	 * corrupted.
-	 */
-	thr->pscthr_callerinfo = psc_alloc(sizeof(struct pfl_callerinfo),
-	    PAF_NOLOG);
 
 	/*
 	 * See psc_ctlmsg_thread_send() on how to return thread
@@ -533,30 +526,7 @@ pscthr_killall(void)
 	PLL_ULOCK(&psc_threads);
 }
 
-struct pfl_callerinfo *
-pscthr_get_callerinfo(void)
-{
-	struct psc_thread *thr;
-	struct pfl_callerinfo *pci;
-	static struct pfl_callerinfo tmp_pci;
-
-	thr = pscthr_get_canfail();
-	if (thr)
-		pci = thr->pscthr_callerinfo;
-	else
-		pci = &tmp_pci;
-
-	return (pci);
-}
-
 #else
-
-struct struct pfl_callerinfo *
-pscthr_get_callerinfo(void)
-{
-	static struct pfl_callerinfo tmp_pci;
-	return (&tmp_pci);
-}
 
 struct psc_thread *
 pscthr_get_canfail(void)

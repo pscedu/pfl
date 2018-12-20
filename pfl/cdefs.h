@@ -95,6 +95,8 @@
 #  define __threadx
 #endif
 
+#define __depr			__attribute__((deprecated))
+
 /* For marking something as file-scoped without side effects of `static'. */
 #define __static
 

@@ -279,41 +279,7 @@ struct pfl_logpoint {
 
 #define PFL_RETURN_STR(str)						\
 	do {								\
-		psclog_trace("exit %s rc='%s'", __func__,		\
-		    (str));						\
-		return (str);						\
-	} while (0)
-
-#define PFL_RETURNX_PCI()						\
-	do {								\
-		psclog_trace("exit %s", __func__);			\
-		_PFL_END_PCI();						\
-		return;							\
-	} while (0)
-
-#define PFL_RETURN_PCI(rv)						\
-	do {								\
-		typeof(rv) _pfl_rv = (rv);				\
-									\
-		psclog_trace("exit %s rc=%ld %p", __func__,		\
-		    (long)_pfl_rv,					\
-		    (void *)(uintptr_t)_pfl_rv);			\
-		_PFL_END_PCI();						\
-		return (_pfl_rv);					\
-	} while (0)
-
-#define PFL_RETURN_LIT_PCI(rv)						\
-	do {								\
-		psclog_trace("exit %s rc=%ld", __func__,		\
-		    (long)(rv));					\
-		_PFL_END_PCI();						\
-		return (rv);						\
-	} while (0)
-
-#define PFL_RETURN_STR_PCI(str)						\
-	do {								\
 		psclog_trace("exit %s rc='%s'", __func__, (str));	\
-		_PFL_END_PCI();						\
 		return (str);						\
 	} while (0)
 
@@ -375,11 +341,11 @@ extern int			 psc_log_console;
 extern int			 psc_logfmt_error;
 extern const char		*psc_logfmt;
 extern char			 psclog_eol[8];
-extern char		 	 psc_hostshort[64];
-extern char			 psc_hostname[64];
+extern char			 psc_hostshort[MAXHOSTNAMELEN];
+extern char			 psc_hostname[MAXHOSTNAMELEN];
 
 extern void			*psc_stack_ptrbuf[32];
-extern char		 	 psc_stack_symbuf[256];
+extern char			 psc_stack_symbuf[256];
 
 extern struct psc_dynarray	_pfl_logpoints;
 

@@ -27,10 +27,7 @@
 
 #include "pfl/compat.h"
 
-#include "pfl/err.h"
-
 #if HAVE_PTHREAD_YIELD
-#  include <pthread.h>
 #  define pscthr_yield()	pthread_yield()
 #else
 #  define pscthr_yield()	sched_yield()
@@ -44,17 +41,22 @@
 		}							\
 	} while (0)
 
-#define PFL_CALLERINFOSS(ss)	(_pfl_callerinfo ? _pfl_callerinfo :	\
-				    _pfl_callerinfo_get(__FILE__,	\
-				    __func__, __LINE__, (ss)))
-#define PFL_CALLERINFO()	PFL_CALLERINFOSS(PSC_SUBSYS)
-
 struct pfl_callerinfo {
 	const char	*pci_filename;
 	const char	*pci_func;
 	int		 pci_lineno;
 	int		 pci_subsys;
 };
+
+#define PFL_CALLERINFOSS(ss)						\
+	(_pfl_callerinfo ? _pfl_callerinfo :				\
+	    (const struct pfl_callerinfo[]){{				\
+		.pci_func = __func__,					\
+		.pci_lineno = __LINE__,					\
+		.pci_filename = __FILE__,				\
+		.pci_subsys = (ss),					\
+	    }})
+#define PFL_CALLERINFO()		PFL_CALLERINFOSS(PSC_SUBSYS)
 
 void	 pfl_abort(void);
 void	 pfl_atexit(void (*)(void));
@@ -65,69 +67,14 @@ void	 pfl_init(void);
 void	 pfl_print_flag(const char *, int *);
 void	 pfl_setprocesstitle(char **, const char *, ...);
 
+extern pid_t	  pfl_pid;
 
-#ifdef HAVE_TLS
-/*
- * We use a stack so the most immediate caller wins; otherwise when
- * calls are deeply nested, the shallow callers will get used by
- * PFL_CALLERINFOSS() and ignore deeper callers.
- */
-# define _PFL_START_PCI(pci)						\
-	do {								\
-		_pfl_callerinfo = (pci);				\
-		_pfl_callerinfo_lvl++;					\
-	} while (0)
-# define _PFL_END_PCI()							\
-	do {								\
-		if (--_pfl_callerinfo_lvl == 0)				\
-			_pfl_callerinfo = NULL;				\
-	} while (0)
-# define _PFL_RETURN_PCI(rv)						\
-	do {								\
-		_PFL_END_PCI();						\
-		return rv;						\
-	} while (0)
-#else
-# define _PFL_START_PCI(pci)
-# define _PFL_END_PCI()
-# define _PFL_RETURN_PCI(rv)	return rv
-#endif
+#define PFL_CALLERINFO_ARG \
+  _Pragma("GCC diagnostic push") \
+  _Pragma("GCC diagnostic ignored \"-Wshadow\"") \
+  const struct pfl_callerinfo *_pfl_callerinfo \
+  _Pragma("GCC diagnostic pop") \
 
-extern
-#ifdef HAVE_TLS
-__thread
-#endif
-const struct pfl_callerinfo	*_pfl_callerinfo;
-
-extern
-#ifdef HAVE_TLS
-__thread
-#endif
-int				 _pfl_callerinfo_lvl;
-
-extern pid_t			  pfl_pid;
-
-#ifdef HAVE_TLS
-# define __callerinfo const struct pfl_callerinfo *pci
-#else
-# define __callerinfo __unusedx const struct pfl_callerinfo *pci
-#endif
-
-struct pfl_callerinfo * pscthr_get_callerinfo();
-
-static __inline const struct pfl_callerinfo *
-_pfl_callerinfo_get(const char *fn, const char *func, int lineno, int subsys)
-{
-	struct pfl_callerinfo *pci;
-
-	pci = pscthr_get_callerinfo();
-
-	pci->pci_filename = fn;
-	pci->pci_func = func;
-	pci->pci_lineno = lineno;
-	pci->pci_subsys = subsys;
-
-	return (pci);
-}
+extern const struct pfl_callerinfo *_pfl_callerinfo;
 
 #endif /* _PFL_PFL_H_ */
