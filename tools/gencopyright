@@ -54,7 +54,6 @@ sub lookup_in_time {
 		last if $date lt $start;
 		$key = $start;
 	}
-	warn "key: $key ($map->{$key})\n";
 	return $map->{$key};
 }
 
