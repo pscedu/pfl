@@ -1,5 +1,4 @@
 #!/usr/bin/env perl
-# $Id$
 # %PSC_START_COPYRIGHT%
 # -----------------------------------------------------------------------------
 # Copyright (c) 2009-2015, Pittsburgh Supercomputing Center (PSC).
@@ -18,7 +17,7 @@
 # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 # CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
-# Pittsburgh Supercomputing Center	phone: 412.268.4960  fax: 412.268.5832
+# Pittsburgh Supercomputing Center	phone: 412.268.4960
 # 300 S. Craig Street			e-mail: remarks@psc.edu
 # Pittsburgh, PA 15213			web: http://www.psc.edu/
 # -----------------------------------------------------------------------------
@@ -32,16 +31,32 @@ sub usage {
 }
 
 my @authors = (
-	{ name => "Google, Inc." ,
+	{ name => "Google, LLC" ,
 	  regex => qr/\@google\.com/, },
 	{ name => "Pittsburgh Supercomputing Center",
 	  regex => qr/\@psc\.edu/, },
 );
 
 my %mailmap = (
-	'slovichon@gmail.com'	=> 'yanovich@psc.edu',
+	'slovichon@gmail.com'	=> {
+		0		=> 'yanovich@psc.edu',
+		'2015-08-03'	=> 'jaredy@google.com',
+	},
 	'zzhsuny@gmail.com'	=> 'zhihui@psc.edu',
 );
+
+sub lookup_in_time {
+	my ($map, $date) = @_;
+
+	my @dates = sort keys %$map;
+	my $key = $dates[0];
+	foreach my $start (@dates) {
+		last if $date lt $start;
+		$key = $start;
+	}
+	warn "key: $key ($map->{$key})\n";
+	return $map->{$key};
+}
 
 sub gencopy {
 	my $fn = shift;
@@ -58,7 +73,14 @@ sub gencopy {
 	foreach my $commit (@commits) {
 		my ($date, $email) = split / /, $commit;
 		$email =~ s/\s$//g;
-		$email = $mailmap{$email} if exists $mailmap{$email};
+		if (exists $mailmap{$email}) {
+			my $mapped = $mailmap{$email};
+			if (ref $mapped eq "HASH") {
+				$email = lookup_in_time($mapped, $date);
+			} else {
+				$email = $mapped;
+			}
+		}
 		my ($yr) = $date =~ /^(\d+)/;
 		foreach my $author (@authors) {
 			if ($email =~ $author->{regex}) {
@@ -135,7 +157,6 @@ $d_cont %END_LICENSE%$d_end
 {$d_start$d_cont %ISC_START_LICENSE%
 $d_cont ---------------------------------------------------------------------
 $d_cont $authors
-$d_cont All rights reserved.
 $d_cont
 $d_cont Permission to use, copy, modify, and distribute this software for any
 $d_cont purpose with or without fee is hereby granted, provided that the
@@ -163,7 +184,6 @@ $d_cont %END_LICENSE%$d_end
 {$d_start$d_cont %GPL_START_LICENSE%
 $d_cont ---------------------------------------------------------------------
 $d_cont $authors
-$d_cont All rights reserved.
 $d_cont
 $d_cont This program is free software; you can redistribute it and/or modify
 $d_cont it under the terms of the GNU General Public License as published by
@@ -188,7 +208,6 @@ $d_cont %END_LICENSE%$d_end
 {$d_start$d_cont %PSCPRI_START_LICENSE%
 $d_cont ---------------------------------------------------------------------
 $d_cont $authors
-$d_cont All rights reserved.
 $d_cont
 $d_cont Permission to use, copy, and modify this software and its
 $d_cont documentation without fee for personal use or non-commercial use

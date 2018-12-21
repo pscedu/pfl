@@ -565,10 +565,12 @@ hdrclean:
 build:
 	${MAKE} clean && ${MAKE} all
 
-copyright:
+gencopyright:
 	find . -type f \( $(						\
 	    ) $(foreach ign,${COPYRIGHT_PATS},-name ${ign} -o) $(	\
 	    ) -false \) -exec ${ECHORUN} ${ROOTDIR}/tools/gencopyright {} \;
+
+copyright: gencopyright
 
 doc: recurse-doc
 	@if ${NOTEMPTY} "${MAN}"; then					\
