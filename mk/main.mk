@@ -148,7 +148,7 @@ ifneq ($(filter pfl,${MODULES}),)
 endif
 
 ifneq ($(filter pscfs,${MODULES}),)
-  MODULES+=	pscfs-hdrs
+  MODULES+=	pscfs-hdrs pthread
   SHLIB_FLAGS=	${BUNDLE_FLAGS}
   SRCS+=	${PFL_BASE}/fs.c
   SRCS+=	${PSCFS_SRCS}
