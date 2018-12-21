@@ -137,10 +137,8 @@ sub get_func_args {
 	local $_;
 	s/^\s+|\s+$//g for @av;
 	@av = () if @av == 1 && $av[0] eq "void";
-	$pci = @av > 0 && $av[0] eq "const struct pfl_callerinfo *pci";
-	if ($pci) {
-		shift @av if $pci;
-	}
+	$pci = @av > 0 && $av[0] eq "PFL_CALLERINFO_ARG";
+	shift @av if $pci;
 	for (@av) {
 		# void (*foo)(const char *, int)
 		unless (s/^.*?\(\s*\*(.*?)\).*/$1/s) {
@@ -150,7 +148,6 @@ sub get_func_args {
 		}
 	}
 	pop @av if @av > 1 && $av[$#av] eq "...";
-	shift @av if $#av > 0 && $av[0] eq "PFL_CALLERINFO_ARG";
 	return @av;
 }
 
