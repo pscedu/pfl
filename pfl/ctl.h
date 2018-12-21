@@ -43,6 +43,7 @@
 #include "pfl/rpc_intrfc.h"
 #include "pfl/service.h"
 #include "pfl/thread.h"
+#include "pfl/waitq.h"
 
 #define PCTHRNAME_EVERYONE	"everyone"
 
@@ -123,7 +124,7 @@ struct psc_ctlmsg_lnetif {
 
 struct psc_ctlmsg_thread {
 	char			pct_thrname[PSC_THRNAME_MAX];
-	char			pct_waitname[MAX_WQ_NAME];
+	char			pct_waitname[PFL_WAITQ_NAME_MAX];
 	int32_t			pct_memnode;
 	uint32_t		pct_flags;
 	uint32_t		pct_tid;

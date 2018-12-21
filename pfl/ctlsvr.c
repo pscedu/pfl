@@ -242,11 +242,12 @@ psc_ctlmsg_thread_send(int fd, struct psc_ctlmsghdr *mh, void *m,
 	pct = PSCALLOC(siz);
 	pct->pct_tid = thr->pscthr_thrid;
 	pct->pct_flags = thr->pscthr_flags;
-	snprintf(pct->pct_thrname, sizeof(pct->pct_thrname),
-	    "%s", thr->pscthr_name);
+	snprintf(pct->pct_thrname, sizeof(pct->pct_thrname), "%s",
+	    thr->pscthr_name);
 	name = thr->pscthr_waitq;
 	if (name)
-		strlcpy(pct->pct_waitname, name, MAX_WQ_NAME);
+		strlcpy(pct->pct_waitname, name,
+		    sizeof(pct->pct_waitname));
 	else
 		pct->pct_waitname[0] = '\0';
 	memcpy(pct->pct_loglevels, thr->pscthr_loglevels,

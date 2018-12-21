@@ -43,7 +43,6 @@
 
 psc_spinlock_t				  psc_umask_lock = SPINLOCK_INIT;
 const struct pfl_callerinfo		*_pfl_callerinfo;
-__threadx int				 _pfl_callerinfo_lvl;
 pid_t					  pfl_pid;
 
 struct timespec				  pfl_uptime;

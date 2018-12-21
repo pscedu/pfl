@@ -31,16 +31,16 @@
 
 struct pfl_mutex;
 
+#define	PFL_WAITQ_NAME_MAX	32
+
 #ifdef HAVE_LIBPTHREAD
 
 # include <pthread.h>
 
-#define	MAX_WQ_NAME		32
-
 struct psc_waitq {
 	struct pfl_mutex	wq_mut;
 	pthread_cond_t		wq_cond;
-	char			wq_name[MAX_WQ_NAME];
+	char			wq_name[PFL_WAITQ_NAME_MAX];
 	int			wq_nwaiters;
 	int			wq_flags;
 };

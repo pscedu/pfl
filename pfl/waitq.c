@@ -53,7 +53,7 @@ _psc_waitq_init(struct psc_waitq *q, const char *name, int flags)
 	int rc;
 
 	memset(q, 0, sizeof(*q));
-	strlcpy(q->wq_name, name, MAX_WQ_NAME);
+	strlcpy(q->wq_name, name, sizeof(q->wq_name));
 	_psc_mutex_init(&q->wq_mut, flags & PWQF_NOLOG ?
 	    PMTXF_NOLOG : 0);
 	rc = pthread_cond_init(&q->wq_cond, NULL);
@@ -190,7 +190,7 @@ void
 psc_waitq_init(struct psc_waitq *q, char *name)
 {
 	memset(q, 0, sizeof(*q));
-	strlcpy(q->wq_name, name, MAX_WQ_NAME);
+	strlcpy(q->wq_name, name, sizeof(q->wq_name));
 }
 
 int
