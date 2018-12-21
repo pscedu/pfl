@@ -357,9 +357,9 @@ psc_ctlrep_getlistcache(int fd, struct psc_ctlmsghdr *mh, void *m)
 			pclc->pclc_nseen = psc_atomic64_read(
 			    &lc->plc_nseen->opst_lifetime);
 			pclc->pclc_flags = lc->plc_flags;
-			pclc->pclc_nw_want = psc_waitq_nwaiters(
+			pclc->pclc_nw_want = pfl_waitq_nwaiters(
 			    &lc->plc_wq_want);
-			pclc->pclc_nw_empty = psc_waitq_nwaiters(
+			pclc->pclc_nw_empty = pfl_waitq_nwaiters(
 			    &lc->plc_wq_empty);
 			LIST_CACHE_ULOCK(lc);
 			rc = psc_ctlmsg_sendv(fd, mh, pclc, NULL);
@@ -424,10 +424,10 @@ psc_ctlrep_getpool(int fd, struct psc_ctlmsghdr *mh, void *msg)
 					&m->ppm_ml.pml_mwcond_empty);
 			} else {
 				pcpl->pcpl_free = lc_nitems(&m->ppm_lc);
-				pcpl->pcpl_nw_want = psc_waitq_nwaiters(
+				pcpl->pcpl_nw_want = pfl_waitq_nwaiters(
 				    &m->ppm_lc.plc_wq_want);
 				pcpl->pcpl_nw_empty =
-				    psc_waitq_nwaiters(
+				    pfl_waitq_nwaiters(
 					&m->ppm_lc.plc_wq_empty);
 			}
 			POOL_ULOCK(m);
@@ -2420,20 +2420,20 @@ psc_ctlacthr_main(struct psc_thread *thr)
 		spinlock(&pcd->pcd_lock);
 		psc_dynarray_add(&pcd->pcd_clifds,
 		    (void *)(uintptr_t)fd);
-		psc_waitq_wakeall(&pcd->pcd_waitq);
+		pfl_waitq_wakeall(&pcd->pcd_waitq);
 		freelock(&pcd->pcd_lock);
 	}
 
 	spinlock(&pcd->pcd_lock);
 	while (pcd->pcd_refcnt) {
-		psc_waitq_wait(&pcd->pcd_waitq, &pcd->pcd_lock);
+		pfl_waitq_wait(&pcd->pcd_waitq, &pcd->pcd_lock);
 		spinlock(&pcd->pcd_lock);
 	}
 
 	DYNARRAY_FOREACH(p, i, &pcd->pcd_clifds)
 		close((int)(long)p);
 	psc_dynarray_free(&pcd->pcd_clifds);
-	psc_waitq_destroy(&pcd->pcd_waitq);
+	pfl_waitq_destroy(&pcd->pcd_waitq);
 	psc_mutex_destroy(&pcd->pcd_mutex);
 }
 
@@ -2443,7 +2443,7 @@ pfl_ctl_destroy(struct pfl_ctl_data *pcd)
 	unlink(pcd->pcd_saun.sun_path);
 	spinlock(&pcd->pcd_lock);
 	pcd->pcd_dead = 1;
-	psc_waitq_wakeall(&pcd->pcd_waitq);
+	pfl_waitq_wakeall(&pcd->pcd_waitq);
 	close(pcd->pcd_sock);
 	freelock(&pcd->pcd_lock);
 }
@@ -2467,12 +2467,12 @@ psc_ctlthr_mainloop(struct psc_thread *thr)
 		spinlock(&pcd->pcd_lock);
 		if (pcd->pcd_dead) {
 			pcd->pcd_refcnt--;
-			psc_waitq_wakeall(&pcd->pcd_waitq);
+			pfl_waitq_wakeall(&pcd->pcd_waitq);
 			freelock(&pcd->pcd_lock);
 			break;
 		}
 		if (psc_dynarray_len(&pcd->pcd_clifds) == 0) {
-			psc_waitq_wait(&pcd->pcd_waitq, &pcd->pcd_lock);
+			pfl_waitq_wait(&pcd->pcd_waitq, &pcd->pcd_lock);
 			continue;
 		}
 		rnd = psc_random32u(psc_dynarray_len(&pcd->pcd_clifds));
@@ -2486,7 +2486,7 @@ psc_ctlthr_mainloop(struct psc_thread *thr)
 			spinlock(&pcd->pcd_lock);
 			psc_dynarray_add(&pcd->pcd_clifds,
 			    (void *)(uintptr_t)s);
-			psc_waitq_wakeall(&pcd->pcd_waitq);
+			pfl_waitq_wakeall(&pcd->pcd_waitq);
 			freelock(&pcd->pcd_lock);
 		} else
 			close(s);
@@ -2561,7 +2561,7 @@ psc_ctlthr_spawn_listener(const char *ofn, int acthrtype)
 	pcd->pcd_sock = s;
 	psc_dynarray_init(&pcd->pcd_clifds);
 	INIT_SPINLOCK(&pcd->pcd_lock);
-	psc_waitq_init(&pcd->pcd_waitq, "ctl-loop");
+	pfl_waitq_init(&pcd->pcd_waitq, "ctl-loop");
 	psc_mutex_init(&pcd->pcd_mutex);
 	pscthr_setready(acthr);
 	return (pcat);
@@ -2616,6 +2616,6 @@ psc_ctlthr_main(const char *ofn, const struct psc_ctlop *ct, int nops,
 	pct->pct_nops = nops;
 	pct->pct_ctldata = pcd;
 	pcd->pcd_refcnt++;
-	psc_waitq_wakeall(&pcd->pcd_waitq);
+	pfl_waitq_wakeall(&pcd->pcd_waitq);
 	freelock(&pcd->pcd_lock);
 }

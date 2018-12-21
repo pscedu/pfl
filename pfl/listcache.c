@@ -67,7 +67,7 @@ _lc_get(struct psc_listcache *plc, const struct timespec *abstime,
 		}
 
 		/* Alert listeners who want to know about exhaustion. */
-		psc_waitq_wakeall(&plc->plc_wq_want);
+		pfl_waitq_wakeall(&plc->plc_wq_want);
 		if (abstime)
 			psclog_debug("lc@%p <%s> timed wait "PSCPRI_TIMESPEC,
 			    plc, plc->plc_name, PSCPRI_TIMESPEC_ARGS(abstime));
@@ -75,7 +75,7 @@ _lc_get(struct psc_listcache *plc, const struct timespec *abstime,
 			psclog_debug("lc@%p <%s> blocking wait", plc,
 			    plc->plc_name);
 		if (abstime) {
-			rc = psc_waitq_waitabs(&plc->plc_wq_empty,
+			rc = pfl_waitq_waitabs(&plc->plc_wq_empty,
 			    LIST_CACHE_GETLOCK(plc), abstime);
 			if (rc) {
 				pfl_assert(rc == ETIMEDOUT);
@@ -83,7 +83,7 @@ _lc_get(struct psc_listcache *plc, const struct timespec *abstime,
 				return (NULL);
 			}
 		} else
-			psc_waitq_wait(&plc->plc_wq_empty,
+			pfl_waitq_wait(&plc->plc_wq_empty,
 			    LIST_CACHE_GETLOCK(plc));
 		LIST_CACHE_LOCK(plc);
 	}
@@ -108,8 +108,8 @@ lc_kill(struct psc_listcache *plc)
 
 	locked = LIST_CACHE_RLOCK(plc);
 	plc->plc_flags |= PLCF_DYING;
-	psc_waitq_wakeall(&plc->plc_wq_empty);
-	psc_waitq_wakeall(&plc->plc_wq_want);
+	pfl_waitq_wakeall(&plc->plc_wq_empty);
+	pfl_waitq_wakeall(&plc->plc_wq_want);
 	LIST_CACHE_URLOCK(plc, locked);
 }
 
@@ -149,9 +149,9 @@ _lc_add(struct psc_listcache *plc, void *p, int flags, void *cmpf)
 	 * list is empty.
 	 */
 	if (flags & PLCBF_WAKEALL)
-		psc_waitq_wakeall(&plc->plc_wq_empty);
+		pfl_waitq_wakeall(&plc->plc_wq_empty);
 	else
-		psc_waitq_wakeone(&plc->plc_wq_empty);
+		pfl_waitq_wakeone(&plc->plc_wq_empty);
 	LIST_CACHE_URLOCK(plc, locked);
 	return (1);
 }
@@ -179,16 +179,16 @@ _lc_init(struct psc_listcache *plc, const char *name, ptrdiff_t offset)
 	INIT_PSC_LISTENTRY(&plc->plc_lentry);
 	_pll_initf(&plc->plc_pll, offset, NULL, 0);
 	snprintf(tmpname, sizeof(tmpname), "%s-empty", name);
-	psc_waitq_init(&plc->plc_wq_empty, tmpname);
+	pfl_waitq_init(&plc->plc_wq_empty, tmpname);
 	snprintf(tmpname, sizeof(tmpname), "%s-want", name);
-	psc_waitq_init(&plc->plc_wq_want, tmpname);
+	pfl_waitq_init(&plc->plc_wq_want, tmpname);
 }
 
 void
 pfl_listcache_destroy(struct psc_listcache *plc)
 {
-	psc_waitq_destroy(&plc->plc_wq_empty);
-	psc_waitq_destroy(&plc->plc_wq_want);
+	pfl_waitq_destroy(&plc->plc_wq_empty);
+	pfl_waitq_destroy(&plc->plc_wq_want);
 }
 
 void
@@ -306,7 +306,7 @@ pfl_listcache_wait_empty(struct psc_listcache *plc)
 {
 	LIST_CACHE_LOCK(plc);
 	while (lc_nitems(plc)) {
-		psc_waitq_wait(&plc->plc_wq_empty,
+		pfl_waitq_wait(&plc->plc_wq_empty,
 		    LIST_CACHE_GETLOCK(plc));
 		LIST_CACHE_LOCK(plc);
 	}

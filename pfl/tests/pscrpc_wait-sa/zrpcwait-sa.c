@@ -59,7 +59,7 @@ do {                                                                         \
 		if (__timeout)                                               \
 		       abstime.tv_sec = __timeout + __now;                   \
 		abstime.tv_nsec = 0;                                         \
-		ret = psc_waitq_timedwait(wq, lck, &abstime);                   \
+		ret = pfl_waitq_timedwait(wq, lck, &abstime);                   \
 		if (ret) {                                                   \
 			ret = -ret;                                          \
 			break;                                               \
@@ -97,10 +97,10 @@ int
 main(void)
 {
 	struct l_wait_info lwi;
-	struct psc_waitq wq;
+	struct pfl_waitq wq;
 	int rc;
 
-	psc_waitq_init(&wq);
+	pfl_waitq_init(&wq);
 
 	lwi = LWI_TIMEOUT(1, NULL, NULL);
 	rc = psc_svr_wait_event(&wq, 0, &lwi, NULL);

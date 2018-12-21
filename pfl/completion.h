@@ -29,14 +29,14 @@
 #include "pfl/waitq.h"
 
 struct psc_compl {
-	struct psc_waitq	pc_wq;
+	struct pfl_waitq	pc_wq;
 	struct psc_spinlock	pc_lock;
 	int			pc_counter;
 	int			pc_done;
 	int			pc_rc;		/* optional "barrier" value */
 };
 
-#define PSC_COMPL_INIT(name)	{ PSC_WAITQ_INIT(name), SPINLOCK_INIT, 0, 0, 1 }
+#define PSC_COMPL_INIT(name)	{ PFL_WAITQ_INIT(name), SPINLOCK_INIT, 0, 0, 1 }
 
 #define psc_compl_ready(pc, rc)	_psc_compl_ready((pc), (rc), 0)
 #define psc_compl_one(pc, rc)	_psc_compl_ready((pc), (rc), 1)

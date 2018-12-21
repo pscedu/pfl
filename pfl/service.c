@@ -697,7 +697,7 @@ pscrpcthr_main(struct psc_thread *thr)
 	SVC_LOCK(svc);
 	svc->srv_nthreads++;
 	psclist_add(&rs->rs_list_entry, &svc->srv_free_rs_list);
-	psc_waitq_wakeall(&svc->srv_free_rs_waitq);
+	pfl_waitq_wakeall(&svc->srv_free_rs_waitq);
 	SVC_ULOCK(svc);
 
 	CDEBUG(D_NET, "service thread started");
@@ -783,10 +783,10 @@ pscrpcthr_main(struct psc_thread *thr)
 	thr->t_id = rc;
 	thr->t_flags = SVC_STOPPED;
 
-	psc_waitq_wakeall(&thr->t_ctl_waitq);
+	pfl_waitq_wakeall(&thr->t_ctl_waitq);
 #endif
 	psclist_del(&prt->prt_lentry, &svc->srv_threads);
-	psc_waitq_wakeall(&svc->srv_waitq);
+	pfl_waitq_wakeall(&svc->srv_waitq);
 	SVC_ULOCK(svc);
 }
 
@@ -916,8 +916,8 @@ pscrpc_unregister_service(struct pscrpc_service *svc)
 
 	pfl_poolmaster_destroy(&svc->srv_poolmaster);
 	psc_mutex_destroy(&svc->srv_mutex);
-	psc_waitq_destroy(&svc->srv_waitq);
-	psc_waitq_destroy(&svc->srv_free_rs_waitq);
+	pfl_waitq_destroy(&svc->srv_waitq);
+	pfl_waitq_destroy(&svc->srv_free_rs_waitq);
 	PSCRPC_OBD_FREE(svc, sizeof(*svc));
 	return 0;
 }
@@ -953,7 +953,7 @@ pscrpc_init_svc(int nbufs, int bufsize, int max_req_size,
 	svc->srv_name = name;
 	psc_mutex_init(&svc->srv_mutex);
 	INIT_PSCLIST_HEAD(&svc->srv_threads);
-	psc_waitq_init(&svc->srv_waitq, "rpc-svc");
+	pfl_waitq_init(&svc->srv_waitq, "rpc-svc");
 
 	svc->srv_nbuf_per_group = test_req_buffer_pressure ? 1 : nbufs;
 	svc->srv_max_req_size = max_req_size;
@@ -983,7 +983,7 @@ pscrpc_init_svc(int nbufs, int bufsize, int max_req_size,
 
 	INIT_PSCLIST_HEAD(&svc->srv_free_rs_list);
 
-	psc_waitq_init(&svc->srv_free_rs_waitq, "reply-state");
+	pfl_waitq_init(&svc->srv_free_rs_waitq, "reply-state");
 
 	spinlock(&pscrpc_all_services_lock);
 	psclist_add(&svc->srv_lentry, &pscrpc_all_services);
@@ -1071,7 +1071,7 @@ pscrpcsvh_delthr(struct pscrpc_svc_handle *svh)
 		    struct pscrpc_thread, prt_lentry);
 		prt->prt_alive = 0;
 	}
-	psc_waitq_wakeall(&svc->srv_waitq);
+	pfl_waitq_wakeall(&svc->srv_waitq);
 	SVC_ULOCK(svc);
 	return (rc);
 }
@@ -1144,7 +1144,7 @@ psc_ctlrep_getrpcsvc(int fd, struct psc_ctlmsghdr *mh, void *m)
 		pcrs->pcrs_nthr = s->srv_nthreads;
 		pcrs->pcrs_nrep = atomic_read(&s->srv_outstanding_replies);
 		pcrs->pcrs_nrqbd = s->srv_nrqbd_receiving;
-		pcrs->pcrs_nwq = psc_waitq_nwaiters(&s->srv_waitq);
+		pcrs->pcrs_nwq = pfl_waitq_nwaiters(&s->srv_waitq);
 		if (s->srv_count_peer_qlens)
 			pcrs->pcrs_flags |= PSCRPC_SVCF_COUNT_PEER_QLENS;
 		SVC_ULOCK(s);

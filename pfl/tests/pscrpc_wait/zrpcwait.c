@@ -39,14 +39,14 @@ int
 main(void)
 {
 	struct l_wait_info lwi;
-	struct psc_waitq wq;
+	struct pfl_waitq wq;
 	int rc;
 
 	if ( pscrpc_ni_init() ) {
 		fprintf(stderr, "pscrpc_ni_init failed\n");
 		exit(1);
 	}
-	psc_waitq_init(&wq);
+	pfl_waitq_init(&wq);
 
 	//t = time(NULL);
 

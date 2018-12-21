@@ -242,7 +242,7 @@ pscrpc_new_import(void)
 	//imp->imp_last_success_conn = 0;
 	imp->imp_state = PSCRPC_IMP_NEW;
 	//imp->imp_obd = class_incref(obd);
-	psc_waitq_init(&imp->imp_recovery_waitq, "imp-recovery");
+	pfl_waitq_init(&imp->imp_recovery_waitq, "imp-recovery");
 
 	atomic_set(&imp->imp_refcount, 2);
 	atomic_set(&imp->imp_inflight, 0);
@@ -281,6 +281,6 @@ pscrpc_import_put(struct pscrpc_import *import)
 	/* XXX what if we fail to establish a connect for a new import */
 	pfl_assert(import->imp_connection);
 	pscrpc_put_connection(import->imp_connection);
-	psc_waitq_destroy(&import->imp_recovery_waitq);
+	pfl_waitq_destroy(&import->imp_recovery_waitq);
 	psc_pool_return(pscrpc_imp_pool, import);
 }

@@ -154,7 +154,7 @@ pscrpc_prep_req_pool(struct pscrpc_import *imp, uint32_t version,
 	INIT_PSC_LISTENTRY(&request->rq_history_lentry);
 	//INIT_PSCLIST_HEAD(&request->rq_replay_list);
 	INIT_PSC_LISTENTRY(&request->rq_set_chain_lentry);
-	psc_waitq_init(&request->rq_reply_waitq, "rpc-reply");
+	pfl_waitq_init(&request->rq_reply_waitq, "rpc-reply");
 	request->rq_xid = pscrpc_next_xid();
 	atomic_set(&request->rq_refcount, 1);
 
@@ -193,7 +193,7 @@ pscrpc_new_bulk(int npages, int type, int portal)
 		return NULL;
 
 	INIT_SPINLOCK(&desc->bd_lock);
-	psc_waitq_init(&desc->bd_waitq, "rpc-bulk");
+	pfl_waitq_init(&desc->bd_waitq, "rpc-bulk");
 	desc->bd_max_iov = npages;
 	desc->bd_iov_count = 0;
 	desc->bd_md_h = LNET_INVALID_HANDLE;
@@ -265,7 +265,7 @@ pscrpc_prep_set(void)
 	INIT_PSCLIST_HEAD(&set->set_requests);
 	INIT_PSC_LISTENTRY(&set->set_lentry);
 	INIT_SPINLOCK(&set->set_lock);
-	psc_waitq_init(&set->set_waitq, "rpc-set");
+	pfl_waitq_init(&set->set_waitq, "rpc-set");
 	psc_compl_init(&set->set_compl);
 	return (set);
 }
@@ -446,7 +446,7 @@ void
 pscrpc_unregister_reply(struct pscrpc_request *request)
 {
 	struct l_wait_info lwi;
-	struct psc_waitq *wq;
+	struct pfl_waitq *wq;
 	char buf[PSCRPC_NIDSTR_SIZE];
 	int rc;
 
@@ -961,7 +961,7 @@ _pscrpc_set_check(struct pscrpc_request_set *set, int finish_one)
 		    set, set->set_remaining);
 
 		atomic_dec(&imp->imp_inflight);
-		psc_waitq_wakeall(&imp->imp_recovery_waitq);
+		pfl_waitq_wakeall(&imp->imp_recovery_waitq);
 
 		if (finish_one) {
 			pscrpc_set_remove_req_locked(set, req);
@@ -981,7 +981,7 @@ pscrpc_set_kill(struct pscrpc_request_set *set)
 {
 	spinlock(&set->set_lock);
 	set->set_dead = 1;
-	psc_waitq_wakeall(&set->set_waitq);
+	pfl_waitq_wakeall(&set->set_waitq);
 	psc_compl_ready(&set->set_compl, 1);
 	freelock(&set->set_lock);
 }
@@ -1023,8 +1023,8 @@ pscrpc_set_destroy(struct pscrpc_request_set *set)
 	}
 
 	pfl_assert(set->set_remaining == 0);
-	pfl_assert(psc_waitq_nwaiters(&set->set_waitq) == 0);
-	psc_waitq_destroy(&set->set_waitq);
+	pfl_assert(pfl_waitq_nwaiters(&set->set_waitq) == 0);
+	pfl_waitq_destroy(&set->set_waitq);
 	psc_compl_destroy(&set->set_compl);
 
 	psc_pool_return(pscrpc_set_pool, set);
@@ -1453,17 +1453,17 @@ pflrpc_req_get_opcode(struct pscrpc_request *rq)
 int
 psc_ctl_rpcrq_getnwaiters(struct pscrpc_request *rq)
 {
-	struct psc_waitq *wq;
+	struct pfl_waitq *wq;
 	struct psc_compl *c;
 	int n = 0;
 
 	wq = rq->rq_waitq;
 	if (wq)
-		n += psc_waitq_nwaiters(wq);
-	n += psc_waitq_nwaiters(&rq->rq_reply_waitq);
+		n += pfl_waitq_nwaiters(wq);
+	n += pfl_waitq_nwaiters(&rq->rq_reply_waitq);
 	c = rq->rq_compl;
 	if (c)
-		n += psc_waitq_nwaiters(&c->pc_wq);
+		n += pfl_waitq_nwaiters(&c->pc_wq);
 	return (n);
 }
 

@@ -57,7 +57,7 @@ struct psc_hashtbl {
 	int			  pht_gen;	/* generation # */
 	int			  pht_nbuckets;
 	int			  pht_ocntr;	/* # free buckets (when resizing) */
-	struct psc_waitq	  pht_waitq;
+	struct pfl_waitq	  pht_waitq;
 	struct psc_hashbkt	 *pht_buckets;
 	struct psc_hashbkt	 *pht_obuckets;	/* old buckets (when resizing */
 	int			(*pht_cmpf)(const void *, const void *);

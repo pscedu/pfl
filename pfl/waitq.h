@@ -37,7 +37,7 @@ struct pfl_mutex;
 
 # include <pthread.h>
 
-struct psc_waitq {
+struct pfl_waitq {
 	struct pfl_mutex	wq_mut;
 	pthread_cond_t		wq_cond;
 	char			wq_name[PFL_WAITQ_NAME_MAX];
@@ -47,15 +47,15 @@ struct psc_waitq {
 
 #define PWQF_NOLOG		(1 << 0)
 
-# define PSC_WAITQ_INIT(name)	{ PSC_MUTEX_INIT, PTHREAD_COND_INITIALIZER, (name), 0, 0 }
+# define PFL_WAITQ_INIT(name)	{ PSC_MUTEX_INIT, PTHREAD_COND_INITIALIZER, (name), 0, 0 }
 
 #else /* HAVE_LIBPTHREAD */
 
-struct psc_waitq {
+struct pfl_waitq {
 	int			wq_nwaiters;
 };
 
-# define PSC_WAITQ_INIT	{ 0 }
+# define PFL_WAITQ_INIT	{ 0 }
 
 #endif
 
@@ -64,8 +64,8 @@ struct psc_waitq {
  * @wq: wait queue.
  * @lk: optional lock to prevent race condition in waiting.
  */
-#define psc_waitq_wait(wq, lk)		 _psc_waitq_waitabs((wq), PFL_LOCKPRIMT_SPIN, (lk), NULL)
-#define psc_waitq_waitf(wq, fl, p)	 _psc_waitq_waitabs((wq), (fl), (p), NULL)
+#define pfl_waitq_wait(wq, lk)		 _pfl_waitq_waitabs((wq), PFL_LOCKPRIMT_SPIN, (lk), NULL)
+#define pfl_waitq_waitf(wq, fl, p)	 _pfl_waitq_waitabs((wq), (fl), (p), NULL)
 
 /*
  * Wait at most the amount of time specified (relative to calling time)
@@ -77,33 +77,33 @@ struct psc_waitq {
  * Returns: ETIMEDOUT if the resource did not become available if
  * @s or @ns was specififed.
  */
-#define psc_waitq_waitrel(wq, lk, s, ns) _psc_waitq_waitrel((wq), PFL_LOCKPRIMT_SPIN, (lk), (s), (ns))
+#define pfl_waitq_waitrel(wq, lk, s, ns) _pfl_waitq_waitrel((wq), PFL_LOCKPRIMT_SPIN, (lk), (s), (ns))
 
-#define psc_waitq_waitrel_s(wq, lk, s)	 psc_waitq_waitrel((wq), (lk), (s), 0L)
-#define psc_waitq_waitrel_us(wq, lk, us) psc_waitq_waitrel((wq), (lk), 0L, (us) * 1000L)
-#define psc_waitq_waitrel_ms(wq, lk, ms) psc_waitq_waitrel((wq), (lk), 0L, (ms) * 1000L * 1000L)
-#define psc_waitq_waitrel_tv(wq, lk, tv) psc_waitq_waitrel((wq), (lk), (tv)->tv_sec, (tv)->tv_usec * 1000L)
-#define psc_waitq_waitrel_ts(wq, lk, tv) psc_waitq_waitrel((wq), (lk), (tv)->tv_sec, (tv)->tv_nsec)
+#define pfl_waitq_waitrel_s(wq, lk, s)	 pfl_waitq_waitrel((wq), (lk), (s), 0L)
+#define pfl_waitq_waitrel_us(wq, lk, us) pfl_waitq_waitrel((wq), (lk), 0L, (us) * 1000L)
+#define pfl_waitq_waitrel_ms(wq, lk, ms) pfl_waitq_waitrel((wq), (lk), 0L, (ms) * 1000L * 1000L)
+#define pfl_waitq_waitrel_tv(wq, lk, tv) pfl_waitq_waitrel((wq), (lk), (tv)->tv_sec, (tv)->tv_usec * 1000L)
+#define pfl_waitq_waitrel_ts(wq, lk, tv) pfl_waitq_waitrel((wq), (lk), (tv)->tv_sec, (tv)->tv_nsec)
 
-#define psc_waitq_waitrelf_us(wq, fl, p, us)	\
-					_psc_waitq_waitrel((wq), (fl), (p), 0L, (us) * 1000L)
+#define pfl_waitq_waitrelf_us(wq, fl, p, us)	\
+					_pfl_waitq_waitrel((wq), (fl), (p), 0L, (us) * 1000L)
 
-#define psc_waitq_waitabs(wq, lk, ts)	_psc_waitq_waitabs((wq), PFL_LOCKPRIMT_SPIN, (lk), (ts))
+#define pfl_waitq_waitabs(wq, lk, ts)	_pfl_waitq_waitabs((wq), PFL_LOCKPRIMT_SPIN, (lk), (ts))
 
 /*
  * Determine number of threads waiting on a waitq.
  * @wq: wait queue.
  */
-#define psc_waitq_nwaiters(wq)		(wq)->wq_nwaiters
+#define pfl_waitq_nwaiters(wq)		(wq)->wq_nwaiters
 
-#define psc_waitq_init(wq, name)	_psc_waitq_init((wq), (name), 0)
-#define psc_waitq_init_nolog(wq, name)	_psc_waitq_init((wq), (name), PWQF_NOLOG)
+#define pfl_waitq_init(wq, name)	_pfl_waitq_init((wq), (name), 0)
+#define pfl_waitq_init_nolog(wq, name)	_pfl_waitq_init((wq), (name), PWQF_NOLOG)
 
-void	_psc_waitq_init(struct psc_waitq *, const char *, int);
-void	 psc_waitq_destroy(struct psc_waitq *);
-void	 psc_waitq_wakeone(struct psc_waitq *);
-void	 psc_waitq_wakeall(struct psc_waitq *);
-int	_psc_waitq_waitrel(struct psc_waitq *, enum pfl_lockprim, void *, long, long);
-int	_psc_waitq_waitabs(struct psc_waitq *, enum pfl_lockprim, void *, const struct timespec *);
+void	_pfl_waitq_init(struct pfl_waitq *, const char *, int);
+void	 pfl_waitq_destroy(struct pfl_waitq *);
+void	 pfl_waitq_wakeone(struct pfl_waitq *);
+void	 pfl_waitq_wakeall(struct pfl_waitq *);
+int	_pfl_waitq_waitrel(struct pfl_waitq *, enum pfl_lockprim, void *, long, long);
+int	_pfl_waitq_waitabs(struct pfl_waitq *, enum pfl_lockprim, void *, const struct timespec *);
 
 #endif /* _PFL_WAITQ_H_ */

@@ -86,7 +86,7 @@ struct pfl_ctl_data {
 	int			 pcd_sock;
 	struct psc_dynarray	 pcd_clifds;
 	psc_spinlock_t		 pcd_lock;
-	struct psc_waitq	 pcd_waitq;
+	struct pfl_waitq	 pcd_waitq;
 	struct pfl_mutex	 pcd_mutex;
 };
 

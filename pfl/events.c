@@ -264,7 +264,7 @@ pscrpc_request_in_callback(lnet_event_t *ev)
 
 	/* NB everything can disappear under us once the request
 	 * has been queued and we unlock, so do the wake now... */
-	psc_waitq_wakeall(&svc->srv_waitq);
+	pfl_waitq_wakeall(&svc->srv_waitq);
 
 	SVC_ULOCK(svc);
 }
@@ -367,7 +367,7 @@ pscrpc_reply_in_callback(lnet_event_t *ev)
 		psc_compl_one(req->rq_compl, 1);
 
 	if (req->rq_waitq)
-		psc_waitq_wakeall(req->rq_waitq);
+		pfl_waitq_wakeall(req->rq_waitq);
 
 	/* NB don't unlock till after wakeup; req can disappear under us
 	 * since we don't have our own ref */
@@ -453,7 +453,7 @@ pscrpc_server_bulk_callback(lnet_event_t *ev)
 	if (ev->unlinked) {
 		/* This is the last callback no matter what... */
 		desc->bd_network_rw = 0;
-		psc_waitq_wakeall(&desc->bd_waitq);
+		pfl_waitq_wakeall(&desc->bd_waitq);
 	}
 
 	freelock(&desc->bd_lock);
@@ -717,7 +717,7 @@ pscrpc_ni_init(int type, int nmsgs)
 void
 pscrpc_ni_fini(void)
 {
-	struct psc_waitq    waitq;
+	struct pfl_waitq    waitq;
 	struct l_wait_info  lwi;
 	int                 rc;
 	int                 retries;
@@ -742,7 +742,7 @@ pscrpc_ni_fini(void)
 				CWARN("Event queue still busy");
 
 			/* Wait for a bit */
-			psc_waitq_init(&waitq, "rpc events");
+			pfl_waitq_init(&waitq, "rpc events");
 			lwi = LWI_TIMEOUT(2, NULL, NULL);
 			(void)pscrpc_svr_wait_event(&waitq, 0, &lwi, NULL);
 			break;

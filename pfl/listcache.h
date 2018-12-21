@@ -48,8 +48,8 @@
 
 struct psc_listcache {
 	struct psc_explist		plc_explist;
-	struct psc_waitq		plc_wq_want;	/* when someone wants an item */
-	struct psc_waitq		plc_wq_empty;	/* when we're empty */
+	struct pfl_waitq		plc_wq_want;	/* when someone wants an item */
+	struct pfl_waitq		plc_wq_empty;	/* when we're empty */
 #define plc_flags	plc_explist.pexl_flags
 #define plc_lentry	plc_explist.pexl_lentry
 #define plc_listhd	plc_explist.pexl_listhd
@@ -89,7 +89,7 @@ struct psc_listcache {
 
 #define LISTCACHE_WAITEMPTY(l, cond)					\
 	while (cond) {							\
-		psc_waitq_wait(&(l)->plc_wq_empty, &(l)->plc_lock);	\
+		pfl_waitq_wait(&(l)->plc_wq_empty, &(l)->plc_lock);	\
 		LIST_CACHE_LOCK(l);					\
 	}
 
@@ -114,7 +114,7 @@ struct psc_listcache {
 #define lc_remove(plc, p)						\
 	do {								\
 		pll_remove(&(plc)->plc_pll, (p));			\
-		psc_waitq_wakeall(&(plc)->plc_wq_empty);		\
+		pfl_waitq_wakeall(&(plc)->plc_wq_empty);		\
 		if ((plc)->plc_st_removes)				\
 			pfl_opstat_incr((plc)->plc_st_removes);		\
 	} while (0)

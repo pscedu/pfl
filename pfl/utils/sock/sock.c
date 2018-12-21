@@ -91,7 +91,7 @@ void
 displaythr_main(__unusedx struct psc_thread *thr)
 {
 	char ratebuf[PSCFMT_HUMAN_BUFSIZ];
-	struct psc_waitq dummy = PSC_WAITQ_INIT("display");
+	struct pfl_waitq dummy = PFL_WAITQ_INIT("display");
 	struct timespec tv;
 	int n = 0;
 
@@ -99,7 +99,7 @@ displaythr_main(__unusedx struct psc_thread *thr)
 	tv.tv_nsec = 500000000;
 	for (;; n++) {
 		tv.tv_sec++;
-		psc_waitq_waitabs(&dummy, NULL, &tv);
+		pfl_waitq_waitabs(&dummy, NULL, &tv);
 
 		if (n == 0) {
 			center("-- read --", 8 * 3);

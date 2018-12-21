@@ -127,7 +127,7 @@ struct access_reply {
 struct access_pendreq {
 	struct psclist_head	 apr_lentry;
 	psc_spinlock_t		 apr_lock;
-	struct psc_waitq	 apr_wq;
+	struct pfl_waitq	 apr_wq;
 	int			 apr_id;
 	int			 apr_fd;
 	int			 apr_op;
@@ -365,7 +365,7 @@ acsvc_climain(__unusedx struct psc_thread *thr)
 			}
 		apr->apr_rep = arp;
 		spinlock(&apr->apr_lock);
-		psc_waitq_wakeall(&apr->apr_wq);
+		pfl_waitq_wakeall(&apr->apr_wq);
 	}
 }
 
@@ -432,7 +432,7 @@ acsreq_issue(struct access_request *arq)
 	spinlock(&apr->apr_lock);
 	apr->apr_id = arq->arq_id;
 	apr->apr_op = arq->arq_op;
-	psc_waitq_init(&apr->apr_wq, "acsreq");
+	pfl_waitq_init(&apr->apr_wq, "acsreq");
 
 	pll_add(&acsvc_pendlist, apr);
 
@@ -445,7 +445,7 @@ acsreq_issue(struct access_request *arq)
 	PSCFREE(arq);
 
 	/* Wait for request return. */
-	psc_waitq_wait(&apr->apr_wq, &apr->apr_lock);	/* XXX check return */
+	pfl_waitq_wait(&apr->apr_wq, &apr->apr_lock);	/* XXX check return */
 
 	pll_remove(&acsvc_pendlist, apr);
 	return (apr);

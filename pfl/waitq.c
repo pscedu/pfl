@@ -48,7 +48,7 @@
  * @q: the struct to be initialized.
  */
 void
-_psc_waitq_init(struct psc_waitq *q, const char *name, int flags)
+_pfl_waitq_init(struct pfl_waitq *q, const char *name, int flags)
 {
 	int rc;
 
@@ -66,7 +66,7 @@ _psc_waitq_init(struct psc_waitq *q, const char *name, int flags)
  * @q: waitq to destroy.
  */
 void
-psc_waitq_destroy(struct psc_waitq *q)
+pfl_waitq_destroy(struct pfl_waitq *q)
 {
 	int rc;
 
@@ -92,7 +92,7 @@ psc_waitq_destroy(struct psc_waitq *q)
  *	the timing calculations accurate.
  */
 int
-_psc_waitq_waitabs(struct psc_waitq *q, enum pfl_lockprim type,
+_pfl_waitq_waitabs(struct pfl_waitq *q, enum pfl_lockprim type,
     void *lockp, const struct timespec *abstime)
 {
 	struct psc_thread *thr;
@@ -131,7 +131,7 @@ _psc_waitq_waitabs(struct psc_waitq *q, enum pfl_lockprim type,
 }
 
 int
-_psc_waitq_waitrel(struct psc_waitq *q, enum pfl_lockprim type,
+_pfl_waitq_waitrel(struct pfl_waitq *q, enum pfl_lockprim type,
     void *lockp, long s, long ns)
 {
 	struct timespec reltime, abstime;
@@ -141,9 +141,9 @@ _psc_waitq_waitrel(struct psc_waitq *q, enum pfl_lockprim type,
 		reltime.tv_sec = s;
 		reltime.tv_nsec = ns;
 		timespecadd(&abstime, &reltime, &abstime);
-		return (_psc_waitq_waitabs(q, type, lockp, &abstime));
+		return (_pfl_waitq_waitabs(q, type, lockp, &abstime));
 	}
-	return (_psc_waitq_waitabs(q, type, lockp, NULL));
+	return (_pfl_waitq_waitabs(q, type, lockp, NULL));
 }
 
 /*
@@ -151,7 +151,7 @@ _psc_waitq_waitrel(struct psc_waitq *q, enum pfl_lockprim type,
  * @q: wait queue to operate on.
  */
 void
-psc_waitq_wakeone(struct psc_waitq *q)
+pfl_waitq_wakeone(struct pfl_waitq *q)
 {
 	psc_mutex_lock(&q->wq_mut);
 	if (q->wq_nwaiters) {
@@ -170,7 +170,7 @@ psc_waitq_wakeone(struct psc_waitq *q)
  * @q: wait queue to operate on.
  */
 void
-psc_waitq_wakeall(struct psc_waitq *q)
+pfl_waitq_wakeall(struct pfl_waitq *q)
 {
 	psc_mutex_lock(&q->wq_mut);
 	if (q->wq_nwaiters) {
@@ -187,14 +187,14 @@ psc_waitq_wakeall(struct psc_waitq *q)
 #else /* HAVE_LIBPTHREAD */
 
 void
-psc_waitq_init(struct psc_waitq *q, char *name)
+pfl_waitq_init(struct pfl_waitq *q, char *name)
 {
 	memset(q, 0, sizeof(*q));
 	strlcpy(q->wq_name, name, sizeof(q->wq_name));
 }
 
 int
-_psc_waitq_waitrel(__unusedx struct psc_waitq *q,
+_pfl_waitq_waitrel(__unusedx struct pfl_waitq *q,
     __unusedx enum pfl_lockprim type, __unusedx void *lockp,
     __unusedx long s, __unusedx long ns)
 {	
@@ -202,24 +202,24 @@ _psc_waitq_waitrel(__unusedx struct psc_waitq *q,
 }
 
 int
-_psc_waitq_waitabs(__unusedx struct psc_waitq *q, __unusedx int flags,
+_pfl_waitq_waitabs(__unusedx struct pfl_waitq *q, __unusedx int flags,
     __unusedx void *p, __unusedx const struct timespec *abstime)
 {
 	psc_fatalx("wait will sleep forever, single threaded");
 }
 
 void
-psc_waitq_wakeone(__unusedx struct psc_waitq *q)
+pfl_waitq_wakeone(__unusedx struct pfl_waitq *q)
 {
 }
 
 void
-psc_waitq_wakeall(__unusedx struct psc_waitq *q)
+pfl_waitq_wakeall(__unusedx struct pfl_waitq *q)
 {
 }
 
 void
-psc_waitq_destroy(__unusedx struct psc_waitq *q)
+pfl_waitq_destroy(__unusedx struct pfl_waitq *q)
 {
 }
 

@@ -140,7 +140,7 @@ struct psc_journal {
 	struct psc_lockedlist		 pj_distillxids;
 
 	struct psc_dynarray		 pj_bufs;
-	struct psc_waitq		 pj_waitq;
+	struct pfl_waitq		 pj_waitq;
 	uint32_t			 pj_nextwrite;		/* next entry slot to write to */
 	uint64_t			 pj_wraparound;		/* stats only */
 	psc_distill_handler_t		 pj_distill_handler;

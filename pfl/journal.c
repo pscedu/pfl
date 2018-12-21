@@ -67,7 +67,7 @@ __static int		pjournal_logwrite_internal(struct psc_journal *,
 psc_spinlock_t		pjournal_count = SPINLOCK_INIT;
 psc_spinlock_t		pjournal_reserve = SPINLOCK_INIT;
 
-struct psc_waitq	pjournal_waitq = PSC_WAITQ_INIT("distill");
+struct pfl_waitq	pjournal_waitq = PFL_WAITQ_INIT("distill");
 psc_spinlock_t		pjournal_waitqlock = SPINLOCK_INIT;
 struct psc_lockedlist	pfl_journals = PLL_INIT(&pfl_journals,
 			    struct psc_journal, pj_lentry);
@@ -345,7 +345,7 @@ pjournal_reserve_slot(struct psc_journal *pj, int count)
 
 			pfl_opstat_incr(pj->pj_opst_reserves);
 			pj->pj_flags |= PJF_WANTSLOT;
-			psc_waitq_wait(&pj->pj_waitq, &pj->pj_lock);
+			pfl_waitq_wait(&pj->pj_waitq, &pj->pj_lock);
 			continue;
 		}
 		spinlock(&t->pjx_lock);
@@ -398,7 +398,7 @@ pjournal_unreserve_slot(struct psc_journal *pj, int count)
 	pj->pj_resrv -= count;
 	if (pj->pj_flags & PJF_WANTSLOT) {
 		pj->pj_flags &= ~PJF_WANTSLOT;
-		psc_waitq_wakeone(&pj->pj_waitq);
+		pfl_waitq_wakeone(&pj->pj_waitq);
 	}
 	PJ_ULOCK(pj);
 }
@@ -436,7 +436,7 @@ pjournal_get_buf(struct psc_journal *pj, size_t size)
 	while (!psc_dynarray_len(&pj->pj_bufs)) {
 		OPSTAT_INCR("journal-get-buf-wait");
 		pj->pj_flags |= PJF_WANTBUF;
-		psc_waitq_wait(&pj->pj_waitq, &pj->pj_lock);
+		pfl_waitq_wait(&pj->pj_waitq, &pj->pj_lock);
 		PJ_LOCK(pj);
 	}
 	pje = psc_dynarray_getpos(&pj->pj_bufs, 0);
@@ -460,7 +460,7 @@ pjournal_put_buf(struct psc_journal *pj, void *buf)
 	if (pj->pj_flags & PJF_WANTBUF) {
 		OPSTAT_INCR("journal-put-buf-wake");
 		pj->pj_flags &= ~PJF_WANTBUF;
-		psc_waitq_wakeall(&pj->pj_waitq);
+		pfl_waitq_wakeall(&pj->pj_waitq);
 	}
 	PJ_ULOCK(pj);
 }
@@ -564,7 +564,7 @@ pjournal_logwrite(struct psc_journal_xidhndl *xh, int type,
 		freelock(&xh->pjx_lock);
 
 		spinlock(&pjournal_waitqlock);
-		psc_waitq_wakeall(&pjournal_waitq);
+		pfl_waitq_wakeall(&pjournal_waitq);
 		freelock(&pjournal_waitqlock);
 	} else {
 		pfl_assert(!xh->pjx_data);
@@ -835,7 +835,7 @@ pjournal_open(const char *name, const char *fn)
 	pll_init(&pj->pj_distillxids, struct psc_journal_xidhndl,
 	    pjx_dstl_lentry, NULL);
 
-	psc_waitq_init(&pj->pj_waitq, "journal");
+	pfl_waitq_init(&pj->pj_waitq, "journal");
 	psc_dynarray_init(&pj->pj_bufs);
 
 	pll_add(&pfl_journals, pj);
@@ -997,7 +997,7 @@ pjournal_thr_main(struct psc_thread *thr)
 			last_reclaimed = reclaimed;
 			reclaimed = 0;
 			/* 30 seconds is the ZFS txg sync interval */
-			psc_waitq_waitrel_s(&pjournal_waitq,
+			pfl_waitq_waitrel_s(&pjournal_waitq,
 			    &pjournal_waitqlock, 30);
 		} else
 			freelock(&pjournal_waitqlock);
@@ -1121,7 +1121,7 @@ psc_ctlrep_getjournal(int fd, struct psc_ctlmsghdr *mh, void *m)
 		pcj->pcj_pndg_xids_cnt	= pll_nitems(&j->pj_pendingxids);
 		pcj->pcj_dstl_xids_cnt	= pll_nitems(&j->pj_distillxids);
 		pcj->pcj_bufs_cnt	= psc_dynarray_len(&j->pj_bufs);
-		pcj->pcj_nwaiters	= psc_waitq_nwaiters(&j->pj_waitq);
+		pcj->pcj_nwaiters	= pfl_waitq_nwaiters(&j->pj_waitq);
 		pcj->pcj_nextwrite	= j->pj_nextwrite;
 		pcj->pcj_wraparound	= j->pj_wraparound;
 		PJ_ULOCK(j);

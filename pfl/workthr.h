@@ -46,7 +46,7 @@ struct pfl_wk_thread {
 
 #define	pfl_workq_lock()		LIST_CACHE_LOCK(&pfl_workq)
 #define	pfl_workq_unlock()		LIST_CACHE_LOCK(&pfl_workq)
-#define	pfl_workq_waitempty()		psc_waitq_wait(&pfl_workq.plc_wq_want,	\
+#define	pfl_workq_waitempty()		pfl_waitq_wait(&pfl_workq.plc_wq_want,	\
 					    &pfl_workq.plc_lock)
 
 void   pfl_wkthr_main(struct psc_thread *);

@@ -100,7 +100,7 @@ pscrpc_nbreapthr_main(struct psc_thread *thr)
 	}
 	reqlock(&set->set_lock);
 	if (--set->set_refcnt) {
-		psc_waitq_wakeall(&set->set_waitq);
+		pfl_waitq_wakeall(&set->set_waitq);
 		freelock(&set->set_lock);
 	} else {
 		pscrpc_set_wait(set);

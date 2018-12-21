@@ -77,7 +77,7 @@ _psc_hashtbl_init(struct psc_hashtbl *t, int flags,
 	memset(t, 0, sizeof(*t));
 	INIT_PSC_LISTENTRY(&t->pht_lentry);
 	INIT_SPINLOCK(&t->pht_lock);
-	_psc_waitq_init(&t->pht_waitq, "hash table", flags & PHTF_NOLOG ?
+	_pfl_waitq_init(&t->pht_waitq, "hash table", flags & PHTF_NOLOG ?
 	    PWQF_NOLOG : 0);
 	t->pht_nbuckets = nb;
 	if (flags & PHTF_STRP)
@@ -174,7 +174,7 @@ psc_hashbkt_put(struct psc_hashtbl *t, struct psc_hashbkt *b)
  out:
 	if (b)
 		psc_hashbkt_unlock(b);
-	psc_waitq_wakeall(&t->pht_waitq);
+	pfl_waitq_wakeall(&t->pht_waitq);
 }
 
 #define GETBKT(t, bv, nb, key)						\
@@ -207,7 +207,7 @@ psc_hashbkt_get(struct psc_hashtbl *t, const void *key)
 		psc_hashbkt_put(t, b);
 		locked = PSC_HASHTBL_RLOCK(t);
 		while (t->pht_flags & PHTF_RESIZING)
-			psc_waitq_wait(&t->pht_waitq,
+			pfl_waitq_wait(&t->pht_waitq,
 			    &t->pht_lock);
 		PSC_HASHTBL_URLOCK(t, locked);
 		goto retry;
@@ -460,7 +460,7 @@ psc_hashtbl_resize(struct psc_hashtbl *t, int nb)
 
 	PSC_HASHTBL_LOCK(t);
 	while (t->pht_flags & PHTF_RESIZING) {
-		psc_waitq_wait(&t->pht_waitq, &t->pht_lock);
+		pfl_waitq_wait(&t->pht_waitq, &t->pht_lock);
 		PSC_HASHTBL_LOCK(t);
 	}
 
@@ -476,7 +476,7 @@ psc_hashtbl_resize(struct psc_hashtbl *t, int nb)
 	for (i = 0, b = t->pht_buckets; i < oldnb; i++, b++) {
 		psc_hashbkt_lock(b);
 		while (b->phb_refcnt) {
-			psc_waitq_wait(&t->pht_waitq, &t->pht_lock);
+			pfl_waitq_wait(&t->pht_waitq, &t->pht_lock);
 			psc_hashbkt_lock(b);
 		}
 

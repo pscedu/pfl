@@ -107,7 +107,7 @@ struct pfl_objref {
 
 #define PSC_OBJREF_GETLOCK(m, r)	_PSC_OBJCAST(m, r, prm_lock_offset, psc_spinlock_t)
 #define PSC_OBJREF_GETMUTEX(m, r)	_PSC_OBJCAST(m, r, prm_lock_offset, pthread_mutex_t)
-#define PSC_OBJREF_GETWAITQ(m, r)	_PSC_OBJCAST(m, r, prm_wait_offset, struct psc_waitq)
+#define PSC_OBJREF_GETWAITQ(m, r)	_PSC_OBJCAST(m, r, prm_wait_offset, struct pfl_waitq)
 #define PSC_OBJREF_GETMWCOND(m, r)	_PSC_OBJCAST(m, r, prm_wait_offset, struct pfl_multiwaitcond)
 #define PSC_OBJREF_GETLISTENTRY(m, r)	_PSC_OBJCAST(m, r, prm_list_offset, struct psclist_head)
 #define PSC_OBJREF_GETLRUENTRY(m, r)	_PSC_OBJCAST(m, r, prm_lru_offset, struct psclist_head)
@@ -195,7 +195,7 @@ pfl_objref_wait(const struct psc_refmgr *prm, struct pfl_objref *pobj)
 		pfl_multiwaitcond_wait(PSC_OBJREF_GETMWCOND(prm, pobj),
 		    PSC_OBJREF_GETMUTEX(prm, pobj));
 	else
-		psc_waitq_wait(PSC_OBJREF_GETWAITQ(prm, pobj),
+		pfl_waitq_wait(PSC_OBJREF_GETWAITQ(prm, pobj),
 		    PSC_OBJREF_GETLOCK(prm, pobj));
 	if (waslocked)
 		pfl_objref_lock(prm, pobj);
@@ -210,7 +210,7 @@ pfl_objref_wake(const struct psc_refmgr *prm, struct pfl_objref *pobj)
 	if (prm->prm_flags & PRMF_MULTIWAIT)
 		pfl_multiwaitcond_wakeup(PSC_OBJREF_GETMWCOND(prm, pobj));
 	else
-		psc_waitq_wakeall(PSC_OBJREF_GETWAITQ(prm, pobj));
+		pfl_waitq_wakeall(PSC_OBJREF_GETWAITQ(prm, pobj));
 	pfl_objref_ureqlock(prm, pobj, locked);
 }
 

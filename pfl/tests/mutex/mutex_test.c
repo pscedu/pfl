@@ -35,7 +35,7 @@
 
 struct pfl_mutex	 m = PSC_MUTEX_INIT;
 struct psc_compl	 compl = PSC_COMPL_INIT("test");
-struct psc_waitq	 wq = PSC_WAITQ_INIT("test");
+struct pfl_waitq	 wq = PFL_WAITQ_INIT("test");
 int			 var = 0;
 
 void *
@@ -43,7 +43,7 @@ spawn(__unusedx void *arg)
 {
 	psc_mutex_lock(&m);
 	psc_compl_ready(&compl, 1);
-	psc_waitq_wait(&wq, NULL);
+	pfl_waitq_wait(&wq, NULL);
 	var = 1;
 	psc_mutex_unlock(&m);
 	return (NULL);
@@ -79,7 +79,7 @@ main(int argc, char *argv[])
 	pfl_assert(!psc_mutex_trylock(&m));
 
 	while (var == 0) {
-		psc_waitq_wakeall(&wq);
+		pfl_waitq_wakeall(&wq);
 		sleep(1);
 	}
 

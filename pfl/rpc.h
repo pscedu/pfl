@@ -203,7 +203,7 @@ struct pscrpc_import {
 	uint64_t			  imp_last_replay_transno;
 	uint64_t			  imp_last_transno_checked; /* optimize */
 	uint64_t			  imp_peer_committed_transno;
-	struct psc_waitq		  imp_recovery_waitq;
+	struct pfl_waitq		  imp_recovery_waitq;
 	void				(*imp_hldropf)(void *);
 	void				 *imp_hldrop_arg;
 	unsigned int			  imp_invalid:1,
@@ -250,7 +250,7 @@ struct pscrpc_request_set {
 	int				 set_remaining;		/* number of RPCs waiting to complete */
 	int				 set_dead:1;
 	int				 set_refcnt:31;
-	struct psc_waitq		 set_waitq;
+	struct pfl_waitq		 set_waitq;
 	struct psc_compl		 set_compl;
 	pscrpc_set_interpreterf		 set_interpret;		/* app callback function */
 	void				*set_arg;		/* app callback arg */
@@ -259,7 +259,7 @@ struct pscrpc_request_set {
 
 #define PSCRPC_SET_INIT(v, cb, cbarg)					\
 	{ PSCLIST_HEAD_INIT((v).set_requests), PSC_LISTENTRY_INIT,	\
-	    0, PSC_WAITQ_INIT, (cb), (cbarg), SPINLOCK_INIT }
+	    0, PFL_WAITQ_INIT, (cb), (cbarg), SPINLOCK_INIT }
 
 struct pscrpc_bulk_desc {
 	unsigned int			 bd_success:1;		/* completed successfully */
@@ -273,7 +273,7 @@ struct pscrpc_bulk_desc {
 	struct pscrpc_connection	*bd_connection;		/* server only		  */
 	struct pscrpc_export		*bd_export;		/* server only		  */
 	struct pscrpc_request		*bd_req;		/* associated request	  */
-	struct psc_waitq		 bd_waitq;		/* server side only WQ	  */
+	struct pfl_waitq		 bd_waitq;		/* server side only WQ	  */
 	int				 bd_iov_count;		/* # entries in bd_iov	  */
 	int				 bd_max_iov;		/* alloc'd size of bd_iov */
 	int				 bd_nob;		/* # bytes covered	  */
@@ -373,10 +373,10 @@ struct pscrpc_request {
 	struct pscrpc_async_args	 rq_async_args;		/* async completion context */
 	lnet_handle_md_t		 rq_req_md_h;
 	struct psc_compl		*rq_compl;
-	struct psc_waitq		*rq_waitq;		/* completion notification for others */
+	struct pfl_waitq		*rq_waitq;		/* completion notification for others */
 	/* client-only incoming reply */
 	lnet_handle_md_t		 rq_reply_md_h;
-	struct psc_waitq		 rq_reply_waitq;
+	struct pfl_waitq		 rq_reply_waitq;
 	/* server-side... */
 	struct timeval			 rq_arrival_time;	/* request arrival time */
 	struct pscrpc_reply_state	*rq_reply_state;	/* separated reply state */
@@ -420,7 +420,7 @@ struct pscrpc_service {
 	struct psclist_head	 srv_active_replies;	/* all the active replies */
 	struct psclist_head	 srv_reply_queue;	/* replies waiting  */
 	struct psclist_head	 srv_free_rs_list;
-	struct psc_waitq	 srv_free_rs_waitq;
+	struct pfl_waitq	 srv_free_rs_waitq;
 
 	struct psc_poolmaster	 srv_poolmaster;
 	struct psc_poolmgr	*srv_pool;
@@ -429,7 +429,7 @@ struct pscrpc_service {
 	 * All threads sleep on this waitq, signalled when new incoming
 	 * requests arrives and when difficult replies are handled.
 	 */
-	struct psc_waitq	 srv_waitq;
+	struct pfl_waitq	 srv_waitq;
 	struct psc_hashtbl	 srv_peer_qlentab;
 
 	struct pfl_mutex	 srv_mutex;
@@ -741,9 +741,9 @@ static __inline void
 pscrpc_wake_client_req(struct pscrpc_request *req)
 {
 	if (req->rq_set == NULL)
-		psc_waitq_wakeall(&req->rq_reply_waitq);
+		pfl_waitq_wakeall(&req->rq_reply_waitq);
 	else
-		psc_waitq_wakeall(&req->rq_set->set_waitq);
+		pfl_waitq_wakeall(&req->rq_set->set_waitq);
 }
 
 #define pscrpc_is_expired(r)						\
@@ -812,11 +812,11 @@ pscrpc_wake_client_req(struct pscrpc_request *req)
 			 * real work to do.				\
 			 */						\
 			if (mtx)					\
-				ret = _psc_waitq_waitabs((wq),		\
+				ret = _pfl_waitq_waitabs((wq),		\
 				    PFL_LOCKPRIMT_MUTEX, (mtx),		\
 				    &_abstime);				\
 			else						\
-				ret = psc_waitq_waitabs((wq), (lck),	\
+				ret = pfl_waitq_waitabs((wq), (lck),	\
 				    &_abstime);				\
 			if ((ret) && (ret) != ETIMEDOUT) {		\
 				(ret) = -(ret);				\

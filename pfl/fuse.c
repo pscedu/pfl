@@ -295,7 +295,7 @@ void
 pscfs_fuse_listener_loop(__unusedx struct psc_thread *thr)
 {
 	static psc_spinlock_t lock = SPINLOCK_INIT;
-	static struct psc_waitq wq = PSC_WAITQ_INIT("fuse-loop");
+	static struct pfl_waitq wq = PFL_WAITQ_INIT("fuse-loop");
 	static int busy;
 
 	size_t bufsize = 0;
@@ -303,7 +303,7 @@ pscfs_fuse_listener_loop(__unusedx struct psc_thread *thr)
 
 	spinlock(&lock);
 	while (busy) {
-		psc_waitq_wait(&wq, &lock);
+		pfl_waitq_wait(&wq, &lock);
 		spinlock(&lock);
 	}
 	busy = 1;
@@ -391,7 +391,7 @@ pscfs_fuse_listener_loop(__unusedx struct psc_thread *thr)
 				 */
 				spinlock(&lock);
 				busy = 0;
-				psc_waitq_wakeone(&wq);
+				pfl_waitq_wakeone(&wq);
 				freelock(&lock);
 
 				fuse_session_process(se, buf, res, ch);
@@ -399,7 +399,7 @@ pscfs_fuse_listener_loop(__unusedx struct psc_thread *thr)
 				/* Acquire the mutex before proceeding */
 				spinlock(&lock);
 				while (busy) {
-					psc_waitq_wait(&wq, &lock);
+					pfl_waitq_wait(&wq, &lock);
 					spinlock(&lock);
 				}
 				busy = 1;
@@ -430,7 +430,7 @@ pscfs_fuse_listener_loop(__unusedx struct psc_thread *thr)
 
 	spinlock(&lock);
 	busy = 0;
-	psc_waitq_wakeone(&wq);
+	pfl_waitq_wakeone(&wq);
 	freelock(&lock);
 }
 

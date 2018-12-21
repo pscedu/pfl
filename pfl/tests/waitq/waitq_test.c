@@ -42,7 +42,7 @@
 
 int nthreads = 4;
 int iterations = 4;
-struct psc_waitq waitq;
+struct pfl_waitq waitq;
 
 __dead void
 usage(void)
@@ -63,7 +63,7 @@ child_main(__unusedx struct psc_thread *thr)
 	/*
 	 * Wait here until the parent signals us to start
 	 */
-	psc_waitq_wait(&waitq, NULL);
+	pfl_waitq_wait(&waitq, NULL);
 
 	psclog_debug("after pseudo barrier");
 
@@ -73,7 +73,7 @@ child_main(__unusedx struct psc_thread *thr)
 	);
 
 	for (i = 0; i < iterations; i++) {
-		psc_waitq_wait(&waitq, NULL);
+		pfl_waitq_wait(&waitq, NULL);
 		psclog_debug("i=%d awake", i);
 	}
 }
@@ -101,18 +101,18 @@ main(int argc, char *argv[])
 
 	psclog_debug("nthreads = %d", nthreads);
 
-	psc_waitq_init(&waitq, "test");
+	pfl_waitq_init(&waitq, "test");
 
 	for (i = 0; i < nthreads; i++)
 		pscthr_init(0, child_main, 0, "thr%d", i);
 
 	sleep(1);
-	psc_waitq_wakeall(&waitq);
+	pfl_waitq_wakeall(&waitq);
 	sleep(2);
 
 	i = nthreads * iterations;
 	while (i--) {
-		psc_waitq_wakeone(&waitq);
+		pfl_waitq_wakeone(&waitq);
 		usleep(30);
 	}
 	return rc;

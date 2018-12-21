@@ -45,7 +45,7 @@
 void
 pfl_opstimerthr_main(struct psc_thread *thr)
 {
-	struct psc_waitq dummy = PSC_WAITQ_INIT("opstats");
+	struct pfl_waitq dummy = PFL_WAITQ_INIT("opstats");
 	struct pfl_opstat *opst;
 	struct timespec ts;
 	double alpha = .25;
@@ -62,7 +62,7 @@ pfl_opstimerthr_main(struct psc_thread *thr)
 
 	while (pscthr_run(thr)) {
 		ts.tv_sec++;
-		psc_waitq_waitabs(&dummy, NULL, &ts);
+		pfl_waitq_waitabs(&dummy, NULL, &ts);
 
 		spinlock(&pfl_opstats_lock);
 		DYNARRAY_FOREACH(opst, i, &pfl_opstats) {
@@ -88,7 +88,7 @@ pfl_opstimerthr_main(struct psc_thread *thr)
 void
 pfl_rusagethr_main(struct psc_thread *thr)
 {
-	struct psc_waitq dummy = PSC_WAITQ_INIT("rusage");
+	struct pfl_waitq dummy = PFL_WAITQ_INIT("rusage");
 	struct rusage ru, lastru;
 	struct timespec ts;
 	long pgsz;
@@ -104,7 +104,7 @@ pfl_rusagethr_main(struct psc_thread *thr)
 
 	while (pscthr_run(thr)) {
 		ts.tv_sec++;
-		psc_waitq_waitabs(&dummy, NULL, &ts);
+		pfl_waitq_waitabs(&dummy, NULL, &ts);
 
 		getrusage(RUSAGE_SELF, &ru);
 

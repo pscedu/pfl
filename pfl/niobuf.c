@@ -315,7 +315,7 @@ pscrpc_unregister_bulk(struct pscrpc_request *rq)
 	/* Disconnect a bulk desc from the network.  Idempotent.  Not
 	 * thread-safe (i.e. only interlocks with completion callback). */
 	struct pscrpc_bulk_desc *desc = rq->rq_bulk;
-	struct psc_waitq        *wq;
+	struct pfl_waitq        *wq;
 	struct l_wait_info       lwi;
 	char buf[PSCRPC_NIDSTR_SIZE];
 	int                      rc, l, registered=0;
@@ -684,7 +684,7 @@ pscrpc_free_reply_state(struct pscrpc_reply_state *rs)
 		SVC_LOCK(svc);
 		psclist_add(&rs->rs_list_entry,
 		    &svc->srv_free_rs_list);
-		psc_waitq_wakeall(&svc->srv_free_rs_waitq);
+		pfl_waitq_wakeall(&svc->srv_free_rs_waitq);
 		SVC_ULOCK(svc);
 	}
 #endif
@@ -706,7 +706,7 @@ _pscrpc_free_req(struct pscrpc_request *rq, __unusedx int locked)
 	pfl_assert(psclist_disjoint(&rq->rq_set_chain_lentry));
 	pfl_assert(rq->rq_set == NULL);
 
-	psc_waitq_destroy(&rq->rq_reply_waitq);
+	pfl_waitq_destroy(&rq->rq_reply_waitq);
 
 	if (atomic_read(&rq->rq_refcount) != 0) {
 		DEBUG_REQ(PLL_ERROR, rq, buf,
@@ -780,7 +780,7 @@ pscrpc_free_bulk(struct pscrpc_bulk_desc *desc)
 	pfl_assert(desc->bd_iov_count != LI_POISON);	/* not freed already */
 	pfl_assert(!desc->bd_network_rw);		/* network hands off or */
 	pfl_assert(!desc->bd_registered);
-	pfl_assert(!psc_waitq_nwaiters(&desc->bd_waitq));
+	pfl_assert(!pfl_waitq_nwaiters(&desc->bd_waitq));
 
 	pfl_assert((desc->bd_export != NULL) ^ (desc->bd_import != NULL));
 	if (desc->bd_export)
@@ -788,7 +788,7 @@ pscrpc_free_bulk(struct pscrpc_bulk_desc *desc)
 	else
 		pscrpc_import_put(desc->bd_import);
 
-	psc_waitq_destroy(&desc->bd_waitq);
+	pfl_waitq_destroy(&desc->bd_waitq);
 
 	PSCRPC_OBD_FREE(desc, offsetof(struct pscrpc_bulk_desc,
 	    bd_iov[desc->bd_max_iov]));
