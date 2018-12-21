@@ -1265,8 +1265,6 @@ lnet_startup_lndnis (void)
 void
 pscrpc_ctlparam_lnet_networks_get(char buf[PCP_VALUE_MAX])
 {
-	char *lnet_get_networks(void);
-
 	strlcpy(buf, lnet_get_networks(), PCP_VALUE_MAX);
 }
 
