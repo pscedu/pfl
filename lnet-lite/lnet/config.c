@@ -89,6 +89,7 @@ lnet_issep (char c)
 	default:
 		return 0;
 	}
+	/* NOTREACHED */
 }
 
 int
@@ -103,6 +104,7 @@ lnet_iswhite (char c)
 	default:
 		return 0;
 	}
+	/* NOTREACHED */
 }
 
 char *
@@ -1150,6 +1152,7 @@ lnet_splitnets(char *source, struct list_head *nets)
 
                 tb = tb2;
         }
+	/* NOTREACHED */
 }
 
 int

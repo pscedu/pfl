@@ -608,10 +608,6 @@ struct libcfs_debug_msg_data {
 extern void libcfs_assertion_failed(const char *expr, const char *file,
                                     const char *fn, const int line);
 
-/* one more external symbol that tracefile provides: */
-extern int trace_copyout_string(char *usr_buffer, int usr_buffer_nob,
-                                const char *knl_buffer, char *append);
-
 static inline void cfs_slow_warning(cfs_time_t now, __unusedx int seconds, char *msg)
 {
         if (cfs_time_after(cfs_time_current(),

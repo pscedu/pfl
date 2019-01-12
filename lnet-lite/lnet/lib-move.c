@@ -437,6 +437,7 @@ lnet_extract_iov (int dst_niov, struct iovec *dst,
                 src_niov--;
                 offset = 0;
         }
+	/* NOTREACHED */
 }
 
 #ifndef __KERNEL__
@@ -1835,6 +1836,7 @@ lnet_parse_put(__unusedx lnet_ni_t *ni, lnet_msg_t *msg)
 
                 return ENOENT;          /* +ve: OK but no match */
         }
+	/* NOTREACHED */
 }
 
 static int
@@ -2062,6 +2064,7 @@ lnet_msgtyp2str (int type)
         default:
                 return ("<UNKNOWN>");
         }
+	/* NOTREACHED */
 }
 
 void
@@ -2795,4 +2798,5 @@ LNetSetAsync(lnet_process_id_t id, int nasync)
         LIBCFS_FREE(nids, maxnids * sizeof(*nids));
         return rc;
 #endif
+	/* NOTREACHED */
 }

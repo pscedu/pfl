@@ -173,6 +173,7 @@ lib_get_event (lnet_eq_t *eq, lnet_event_t *ev)
 
         eq->eq_deq_seq = new_event->sequence + 1;
         RETURN(rc);
+	/* NOTREACHED */
 }
 
 
@@ -346,4 +347,5 @@ LNetEQPoll (lnet_handle_eq_t *eventqs, int neq, int timeout_ms,
 # endif
 #endif
         }
+	/* NOTREACHED */
 }

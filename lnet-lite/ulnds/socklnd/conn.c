@@ -756,6 +756,7 @@ int usocklnd_type2idx(int type)
                 LBUG();
                 return 0; /* make compiler happy */
         }
+	/* NOTREACHED */
 }
 
 usock_peer_t *
@@ -1014,6 +1015,7 @@ usocklnd_invert_type(int type)
         default:
                 return SOCKLND_CONN_NONE;
         }
+	/* NOTREACHED */
 }
 
 void
