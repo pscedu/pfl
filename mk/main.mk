@@ -30,6 +30,8 @@ FILE_CFLAGS=		${$(call PATH_NAMIFY,$(call STRIPROOTDIR,$(realpath $1)))_CFLAGS}
 FILE_PCPP_FLAGS=	${$(call PATH_NAMIFY,$(call STRIPROOTDIR,$(realpath $1)))_PCPP_FLAGS}
 ADD_FILE_CFLAGS=	$(shell if ! [ -f "$(abspath $1)" ]; then echo "ADD_FILE_CFLAGS: no such file: $(abspath $1)" >&2; fi )\
 			$(eval $(call FILE_CFLAGS_VARNAME,$1)+=$2)
+ADD_FILE_PCPP_FLAGS=	$(shell if ! [ -f "$(abspath $1)" ]; then echo "ADD_FILE_PCPP_FLAGS: no such file: $(abspath $1)" >&2; fi )\
+			$(eval $(call FILE_PCPP_FLAGS_VARNAME,$1)+=$2)
 
 FORCE_INST?=		0
 
@@ -418,9 +420,6 @@ ${OBJDIR}/$(notdir %.E) : %.c | ${OBJDIR}
 
 ${OBJDIR}/$(notdir %.c) : %.l | ${OBJDIR}
 	${LEX} ${LFLAGS} $(realpath $<) > $@
-
-#	$(eval $$(call FILE_PCPP_FLAGS_VARNAME,$@)+=$$(call FILE_PCPP_FLAGS,$<))
-#	$(eval $$(call FILE_CFLAGS_VARNAME,$@)+=$$(call FILE_CFLAGS,$<))
 
 ${OBJDIR}/$(notdir %.c) : %.y | ${OBJDIR}
 	${YACC} ${YFLAGS} -o $@ $(realpath $<)

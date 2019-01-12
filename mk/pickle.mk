@@ -72,6 +72,7 @@ ifeq ($(filter $(realpath ${ROOTDIR})/compat/%,${CURDIR}),)
   DEFINES+=						-DHAVE_STRLCPY
  else
   STR_SRCS+=						${PFL_BASE}/compat/strlcpy.c
+  $(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/compat/strlcpy.c,-TR)
  endif
 
  ifdef PICKLE_HAVE_STRNLEN
@@ -292,6 +293,7 @@ ifeq ($(filter $(realpath ${ROOTDIR})/compat/%,${CURDIR}),)
   DEFINES+=						-DHAVE_STRVIS
  else
   STRVIS_SRCS+=						${PFL_BASE}/compat/strvis.c
+  $(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/compat/strvis.c,-TR)
  endif
 
  ifdef PICKLE_HAVE_PTHREAD_YIELD

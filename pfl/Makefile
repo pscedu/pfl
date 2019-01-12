@@ -62,3 +62,24 @@ SRCS+=		${STRVIS_SRCS}
 MODULES+=	lnet-hdrs pthread clock rt acl
 
 include ${PFLMK}
+
+$(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/alloc.c,-RT)
+$(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/base64.c,-RT)
+$(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/bsearch.c,-RT)
+$(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/crc.c,-RT)
+$(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/dynarray.c,-RT)
+$(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/err_pfl.c,-RT)
+$(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/fmt.c,-RT)
+$(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/fts.c,-RT)
+$(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/hashtbl.c,-RT)
+$(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/init.c,-RT)
+$(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/lockedlist.c,-RT)
+$(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/log.c,-RT)
+$(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/memnode.c,-RT)
+$(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/printhex.c,-RT)
+$(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/pthrutil.c,-RT)
+$(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/strnvis.c,-RT)
+$(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/subsys.c,-RT)
+$(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/thread.c,-RT)
+$(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/waitq.c,-RT)
+#$(call ADD_FILE_PCPP_FLAGS,${PFL_BASE}/lib-move.c,-RT)
