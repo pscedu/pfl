@@ -75,7 +75,7 @@ endif
 LFLAGS+=	-t
 YFLAGS+=	-d
 
-CFLAGS+=	-Wall -Wextra -pipe -Wredundant-decls
+CFLAGS+=	-Wall -Wextra -pipe -Wredundant-decls -Wdeprecated
 CFLAGS+=	-Wshadow -fno-omit-frame-pointer
 LDFLAGS+=	-fno-omit-frame-pointer
 #CFLAGS+=	-Wno-address
@@ -251,7 +251,7 @@ ifeq (${OSTYPE},Darwin)
   DEFINES+=	-D_DARWIN_C_SOURCE -D_DARWIN_FEATURE_64_BIT_INODE
   DEFINES+=	-DHAVE_NO_POLL_DEV
   INCLUDES+=	-I/opt/local/include
-  CFLAGS+=	-Wno-deprecated-declarations -Wno-address-of-packed-member
+  CFLAGS+=	-Wno-address-of-packed-member
   THREAD_LIBS=	-lpthread
 
   WHOLE_LIB_FLAGS=	-force_load $$(${LIBDEP} ${LDFLAGS_DIRS} $1)
