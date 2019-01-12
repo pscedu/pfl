@@ -245,7 +245,7 @@ psclist_disjoint(const struct psc_listentry *e)
 #define psclist_conjoint(e, hd)	_psclist_conjoint(PFL_CALLERINFO(), (e), (hd))
 
 /**
- * psclist_conjoint - Test whether a psc_listentry is on a list.
+ * Test whether a psc_listentry is on a list.
  * @e: the psc_listentry to test.
  * @hd: the psclist_head the entry must be on.
  */

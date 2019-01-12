@@ -41,14 +41,16 @@
 #include "pfl/thread.h"
 #include "pfl/time.h"
 
-psc_spinlock_t				  psc_umask_lock = SPINLOCK_INIT;
-const struct pfl_callerinfo		*_pfl_callerinfo;
-pid_t					  pfl_pid;
+psc_spinlock_t		  psc_umask_lock = SPINLOCK_INIT;
+pid_t			  pfl_pid;
 
-struct timespec				  pfl_uptime;
+struct timespec		  pfl_uptime;
 
 /* no functional usage, used to debug lease expiration time */
-time_t					  pfl_start_time;
+time_t			  pfl_start_time;
+
+const struct pfl_callerinfo
+			 *_pfl_callerinfo;
 
 pid_t
 pfl_getsysthrid(void)

@@ -356,7 +356,7 @@ pfl_fmtlogdate(const struct timeval *tv, const char **s, char *bufp)
 }
 
 const char *
-pflog_get_stacktrace()
+pflog_get_stacktrace(void)
 {
 #ifdef HAVE_BACKTRACE
 	char **symv, *sym, *name, *end;
@@ -418,9 +418,8 @@ void
 _psclogv(const struct pfl_callerinfo *pci, int level, int options,
     const char *fmt, va_list ap)
 {
-	char bufp[LINE_MAX];
-	char *p, buf[BUFSIZ];
 	extern const char *__progname;
+	char bufp[LINE_MAX], *p, buf[BUFSIZ];
 	struct psc_thread *thr;
 	struct timeval tv;
 	const char *thrname;
@@ -431,9 +430,6 @@ _psclogv(const struct pfl_callerinfo *pci, int level, int options,
 	save_errno = errno;
 
 	thr = pscthr_get_canfail();
-	/*
-	 * XXX Set log level 5 crashes right away.
-	 */
 	if (!thr)
 		return;
 	thrid = thr->pscthr_thrid;
