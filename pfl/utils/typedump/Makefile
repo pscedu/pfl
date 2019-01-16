@@ -12,6 +12,8 @@ MODULES+=	lnet-hdrs pthread pfl
 
 include ${PFLMK}
 
+$(call ADD_FILE_PCPP_FLAGS,typedump.c,-TR)
+
 typedump.c: ${OBJDIR}/typedump.h
 
 ${OBJDIR}/typedump.h: ${OBJDIR} ${PFL_BASE}/*.h

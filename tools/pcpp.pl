@@ -43,7 +43,7 @@ my %hacks = (
 	yytext		=> 0,
 );
 my %opts;
-getoptv("fH:x", \%opts) or usage;
+getoptv("fH:RT", \%opts) or usage;
 usage unless @ARGV == 1;
 
 if ($opts{H}) {
@@ -60,45 +60,80 @@ local $/;
 my $data = <F>;
 close F;
 
+my $output = "";
+
 # debug file ID
-print qq{# 1 "$fn"\n};
+$output .= qq{# 1 "$fn"\n};
 
-if (!$opts{f} and (
-    basename($fn) eq "alloc.c" or
-    basename($fn) eq "dynarray.c" or
-    basename($fn) eq "hashtbl.c" or
-    basename($fn) eq "init.c" or
-    basename($fn) eq "lib-move.c" or
-    basename($fn) eq "lockedlist.c" or
-    basename($fn) eq "log.c" or
-    basename($fn) eq "subsys.c" or
-    basename($fn) eq "thread.c" or
-    basename($fn) eq "typedump.c" or
-    basename($fn) eq "waitq.c" or
-    $opts{x})) {
-	print $data;
-	exit 0;
-}
+my $inject_tracing = !$opts{T};
+my $inject_returns = !$opts{R};
 
-my $pfl = $data =~ m!pfl/log\.h! || $opts{f};
-
-my $i;
+my $pos;
 my $lvl = 0;
 my $foff;
 my $linenr = 0;
-my $pci;
+my $undef_pci = 0;
 
 sub advance {
 	my ($len) = @_;
 
-	my $str = substr($data, $i, $len);
-	print $str;
+	my $str = substr($data, $pos, $len);
+	$output .= $str;
 	my @m = $str =~ /\n/g;
 	$linenr += @m;
-	$i += $len;
+	$pos += $len;
 }
 
-sub get_containing_func {
+sub in_array {
+	my ($needle, $r_hay) = @_;
+	for (@$r_hay) {
+		return 1 if $_ eq $needle;
+	}
+	return 0;
+}
+
+# Determines if a type is aggregate (e.g. struct).  Notably typedefs
+# will be missed.
+sub type_is_aggregate {
+	my ($type) = @_;
+	my @types = qw();
+	return $type =~ /^(?:lnet|cfs)_.*_t$/ ||
+	   $type =~ /struct\b[^*]*$/ ||
+	   in_array($type, \@types);
+}
+
+sub get_containing_func_return_type {
+	return "" unless defined $foff;
+
+	my $plevel = 0;
+	my $j;
+	# Skip past function arguments.
+	for ($j = $foff; $j > 0; $j--) {
+		if (substr($data, $j, 1) eq ")") {
+			$plevel++;
+		} elsif (substr($data, $j, 1) eq "(") {
+			if (--$plevel == 0) {
+				$j--;
+				last;
+			}
+		}
+	}
+	# Skip function name.
+	$j-- while substr($data, $j, 1) =~ /\s/;
+	$j-- while substr($data, $j - 1, 1) =~ /[a-zA-Z0-9_]/;
+
+	$j-- while substr($data, $j - 1, 1) =~ /\s/;
+
+	# Gather function return type.
+	my $len = 0;
+	$j--, $len++ while substr($data, $j - 1, 1) =~ /[ a-z*A-Z0-9_]/;
+	my $type = substr($data, $j, $len);
+	return $type;
+}
+
+sub get_containing_func_name {
+	return "" unless defined $foff;
+
 	my $plevel = 0;
 	my $j;
 	for ($j = $foff; $j > 0; $j--) {
@@ -120,7 +155,7 @@ sub get_containing_func {
 sub get_func_args {
 	my $plevel = 0;
 	my ($j, $k, @av);
-	for ($j = $i; $j > 0; $j--) {
+	for ($j = $pos; $j > 0; $j--) {
 		if (substr($data, $j, 1) eq "," && $plevel == 1) {
 			unshift @av, substr($data, $j + 1, $k - $j);
 			$k = $j - 1;
@@ -137,24 +172,34 @@ sub get_func_args {
 	local $_;
 	s/^\s+|\s+$//g for @av;
 	@av = () if @av == 1 && $av[0] eq "void";
-	$pci = @av > 0 && $av[0] eq "PFL_CALLERINFO_ARG";
-	shift @av if $pci;
+	my $pci = "";
+	if (@av > 0 && $av[0] =~ /struct\s+pfl_callerinfo\s*\*(\w+)/) {
+		$pci = $1;
+		shift @av;
+	}
+	my @deletions;
+	my $index = 0;
+	my @new_av;
 	for (@av) {
 		# void (*foo)(const char *, int)
 		unless (s/^.*?\(\s*\*(.*?)\).*/$1/s) {
 			# __unusedx const char *foo[BLAH]
 			s/\[.*//s;
-			s/^.*?(\w+)$/$1/s;
+			if (s/^(.*?)\s*(\w+)$/$2/s) {
+				next if type_is_aggregate($1);
+			}
 		}
+		push @new_av, $_;
 	}
+	@av = @new_av;
 	pop @av if @av > 1 && $av[$#av] eq "...";
-	return @av;
+	return ($pci, @av);
 }
 
 sub get_containing_tag {
 	my $blevel = 1;
 	my ($j);
-	for ($j = $i - 1; $j > 0; $j--) {
+	for ($j = $pos - 1; $j > 0; $j--) {
 		if (substr($data, $j, 1) eq '"') {
 			for ($j--; $j > 0; $j--) {
 				last if substr($data, $j, 1) eq '"' and
@@ -195,6 +240,10 @@ sub containing_func_is_dead {
 sub dec_level {
 	$foff = undef unless --$lvl;
 	fatal "brace level $lvl < 0 at $linenr: $ARGV[0]" if $lvl < 0;
+	if ($undef_pci && $lvl == 0) {
+		$output .= "\n#undef _pfl_callerinfo\n";
+		$undef_pci = 0;
+	}
 }
 
 sub count_newlines {
@@ -205,174 +254,183 @@ sub count_newlines {
 
 $data =~ s{/\*(.*?)\*/}{ count_newlines($1) }egs;
 
-for ($i = 0; $i < length $data; ) {
-	if (substr($data, $i, 1) eq "#") {
+for ($pos = 0; $pos < length $data; ) {
+	if (substr($data, $pos, 1) eq "#") {
 		# skip preprocessor
 		advance(1);
 		my $esc = 0;
-		for (; $i < length($data); advance(1)) {
+		for (; $pos < length($data); advance(1)) {
 			if ($esc) {
 				$esc = 0;
-			} elsif (substr($data, $i, 1) eq "\\") {
+			} elsif (substr($data, $pos, 1) eq "\\") {
 				$esc = 1;
-			} elsif (substr($data, $i, 1) eq "\n") {
+			} elsif (substr($data, $pos, 1) eq "\n") {
 				last;
 			}
 		}
 		advance(1);
-	} elsif (substr($data, $i, 2) eq q{//}) {
+	} elsif (substr($data, $pos, 2) eq q{//}) {
 		# skip single-line comments
-		if (substr($data, $i + 2) =~ m[\n]) {
+		if (substr($data, $pos + 2) =~ m[\n]) {
 			advance($+[0] + 1);
 		} else {
-			advance(length($data) - $i);
+			advance(length($data) - $pos);
 		}
-	} elsif (substr($data, $i, 1) =~ /['"]/) {
+	} elsif (substr($data, $pos, 1) =~ /['"]/) {
 		my $ch = $&;
 		# skip strings
 		advance(1);
 		my $esc = 0;
-		for (; $i < length($data); advance(1)) {
+		for (; $pos < length($data); advance(1)) {
 			if ($esc) {
 				$esc = 0;
-			} elsif (substr($data, $i, 1) eq "\\") {
+			} elsif (substr($data, $pos, 1) eq "\\") {
 				$esc = 1;
-			} elsif (substr($data, $i, 1) eq $ch) {
+			} elsif (substr($data, $pos, 1) eq $ch) {
 				last;
 			}
 		}
 		advance(1);
-	} elsif ($lvl == 0 && substr($data, $i) =~ /^([^=]\s*\n)({\s*\n)/s) {
+	} elsif ($lvl == 0 && substr($data, $pos) =~ /^([^=]\s*\n)({\s*\n)/s) {
 		my $plen = $+[1];
 		my $slen = $+[2] - $-[2];
 
 		# catch routine entrance
 		warn "nested function?\n" if defined $foff;
-		$foff = $i;
-		my @args = get_func_args();
+		$foff = $pos;
+		my ($pci, @args) = get_func_args();
 		advance($plen);
+		if (get_containing_func_name() ne "main" and $pci) {
+			$output .= qq{#define _pfl_callerinfo $pci\n};
+			$undef_pci = 1;
+		}
+
+		# -1 to exclude newline so we don't skew line numbers
 		advance($slen - 1);
-		unless (get_containing_func() eq "main" or !$pfl) {
-			print qq{psclog_trace("enter %s};
+
+		if (get_containing_func_name() ne "main" and $inject_tracing) {
+			$output .= qq{psclog_trace("enter %s};
 			my $endstr = "";
 			foreach my $arg (@args) {
-				print " $arg=%p:%ld";
+				$output .= " $arg=%p:%ld";
 				$endstr .= ", (void *)(unsigned long)$arg, (long)$arg";
 			}
-			print qq{", __func__$endstr);};
+			$output .= qq{", __func__$endstr);};
 		}
 		advance(1);
 		$lvl++;
-	} elsif (substr($data, $i) =~ /^return(\s*;\s*}?)/s) {
+	} elsif (substr($data, $pos) =~ /^return(\s*;\s*}?)/s) {
 		# catch 'return' without an arg
 		my $end = $1;
-		$i += $-[1];
+		$pos += $-[1];
 		my $elen = $+[1] - $-[1];
-		if ($pfl) {
-			print "PFL_RETURNX()";
+		if ($inject_returns) {
+			$output .= "PFL_RETURNX()";
 		} else {
-			print "return";
+			$output .= "return";
 		}
 		advance($elen);
 		dec_level() if $end =~ /}/;
-	} elsif (substr($data, $i) =~ /^return(\s*(?:\(\s*".*?"\s*\)|".*?"))(\s*;\s*}?)/s) {
+	} elsif (substr($data, $pos) =~ /^return(\s*(?:\(\s*".*?"\s*\)|".*?"))(\s*;\s*}?)/s) {
 		# catch 'return' with string literal arg
 		my $rv = $1;
 		my $end = $2;
-		$i += $-[1];
+		$pos += $-[1];
 		my $rvlen = $+[1] - $-[1];
 		my $elen = $+[2] - $-[2];
-		if ($pfl) {
-			print "PFL_RETURN_STR("
+		if ($inject_returns) {
+			$output .= "PFL_RETURN_STR("
 		} else {
-			print "return (";
+			$output .= "return (";
 		}
 		advance($rvlen);
-		print ")";
+		$output .= ")";
 		advance($elen);
 		dec_level() if $end =~ /}/;
-	} elsif (substr($data, $i) =~ /^return\b(\s*(?:\(\s*\d+\s*\)|\d+))(\s*;\s*}?)/s) {
+	} elsif (substr($data, $pos) =~ /^return\b(\s*(?:\(\s*\d+\s*\)|\d+))(\s*;\s*}?)/s) {
 		# catch 'return' with numeric literal arg
 		my $rv = $1;
 		my $end = $2;
-		$i += $-[1];
+		$pos += $-[1];
 		my $rvlen = $+[1] - $-[1];
 		my $elen = $+[2] - $-[2];
-		if ($pfl) {
-			print "PFL_RETURN_LIT(";
+		if ($inject_returns) {
+			$output .= "PFL_RETURN_LIT(";
 		} else {
-			print "return (";
+			$output .= "return (";
 		}
 		advance($rvlen);
-		print ")";
+		$output .= ")";
 		advance($elen);
 		dec_level() if $end =~ /}/;
-	} elsif (substr($data, $i) =~ /^return\b(\s*.*?)(\s*;\s*}?)/s) {
+	} elsif (substr($data, $pos) =~ /^return\b(\s*.*?)(\s*;\s*}?)/s) {
 		# catch 'return' with an arg
 		my $rv = $1;
 		my $end = $2;
-		$i += $-[1];
+		$pos += $-[1];
 		my $rvlen = $+[1] - $-[1];
 		my $elen = $+[2] - $-[2];
 		my $skiplen = 0;
 
 		my $tag = "PFL_RETURN";
 		if ($rv =~ /^\s*\(\s*PCPP_STR\s*\((.*)\)\s*\)$/) {
-			$i += $-[1];
+			$pos += $-[1];
 			$rvlen -= $-[1];
 			$skiplen = $+[0] - $+[1];
 			$rvlen -= $skiplen;
 			$tag = "PFL_RETURN_STR";
 		} elsif ($rv =~ /^\s*\(?\s*yytext\s*\)?\s*$/ && $hacks{yytext}) {
 			$tag = "PFL_RETURN_STR";
+		} elsif (type_is_aggregate(get_containing_func_return_type)) {
+			$tag = "PFL_RETURN_AGGR";
 		}
 
-		if ($pfl) {
-			print "$tag(";
+		if ($inject_returns) {
+			$output .= "$tag(";
 		} else {
-			print "return (";
+			$output .= "return (";
 		}
 		advance($rvlen);
-		print ")";
-		$i += $skiplen;
+		$output .= ")";
+		$pos += $skiplen;
 		advance($elen);
 		dec_level() if $end =~ /}/;
-	} elsif ($lvl == 1 && substr($data, $i) =~ /^(?:psc_fatalx?|exit|errx?)\s*\([^;]*?\)\s*;\s*}/s) {
+	} elsif ($lvl == 1 && substr($data, $pos) =~ /^(?:psc_fatalx?|exit|errx?)\s*\([^;]*?\)\s*;\s*}/s) {
 		# XXX this pattern skips psc_fatal("foo; bar")
 		# because of the embedded semi-colon
 
 		# skip no return conditions
 		advance($+[0]);
 		dec_level();
-	} elsif ($lvl == 1 && substr($data, $i) =~ /^goto\s*\w+\s*;\s*}/s) {
+	} elsif ($lvl == 1 && substr($data, $pos) =~ /^goto\s*\w+\s*;\s*}/s) {
 		# skip no return conditions
 		advance($+[0]);
 		dec_level();
-	} elsif ($lvl == 1 && substr($data, $i) =~ m[^\s*/\*\s*NOTREACHED\s*\*/\s*}]s) {
+	} elsif ($lvl == 1 && substr($data, $pos) =~ m[^\s*/\*\s*NOTREACHED\s*\*/\s*}]s) {
 		# skip no return conditions
 		advance($+[0]);
 		dec_level();
-	} elsif ($hacks{yyerrlab} && $lvl == 1 && substr($data, $i) =~ /^\n\s*yyerrlab:\s*$/m) {
+	} elsif ($hacks{yyerrlab} && $lvl == 1 && substr($data, $pos) =~ /^\n\s*yyerrlab:\s*$/m) {
 		advance($+[0]);
-		print "if (0) goto yyerrlab;";
+		$output .= "if (0) goto yyerrlab;";
 		$hacks{yyerrlab} = 0;
-	} elsif (substr($data, $i) =~ /^\w+/) {
+	} elsif (substr($data, $pos) =~ /^\w+/) {
 		advance($+[0]);
-	} elsif (substr($data, $i, 1) eq "{") {
+	} elsif (substr($data, $pos, 1) eq "{") {
 		$lvl++;
 		advance(1);
-	} elsif (substr($data, $i, 1) eq "}") {
+	} elsif (substr($data, $pos, 1) eq "}") {
 		if ($lvl == 1 && defined $foff) {
-			if (substr($data, $i + 1) =~ /^\s*\n/s) {
+			if (substr($data, $pos + 1) =~ /^\s*\n/s) {
 				# catch implicit 'return'
 				for (;;) {
 					last if containing_func_is_dead;
 					last if $hacks{yysyntax_error} and
-					    get_containing_func eq "yysyntax_error";
+					    get_containing_func_name eq "yysyntax_error";
 					last if $hacks{yylex_return} and
 					    get_containing_tag eq "YY_DECL";
-					if ($pfl) {
-						print "PFL_RETURNX();";
+					if ($inject_returns) {
+						$output .= "PFL_RETURNX();";
 					}
 					last;
 				}
@@ -384,3 +442,18 @@ for ($i = 0; $i < length $data; ) {
 		advance(1);
 	}
 }
+
+if ($inject_tracing or $inject_returns) {
+	my @lines = split /\n/, $output;
+	for (my $i = $#lines; $i > 0; $i--) {
+		if ($lines[$i] =~ /^#include/) {
+			splice @lines, $i, 0,
+			  qq{#include "pfl/log.h"},
+			  qq{# $i "$fn"};
+			last;
+		}
+	}
+	$output = join "\n", @lines;
+}
+
+print $output;
