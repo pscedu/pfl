@@ -388,16 +388,15 @@ pscrpc_push_req(struct pscrpc_request *req)
 	if (req->rq_phase == PSCRPC_RQ_PHASE_NEW)
 		/* pscrpc_send_new_req_locked() frees the lock. */
 		return (pscrpc_send_new_req_locked(req));
-	else {
-		/*
-		 * This is OK; it means that another thread has done a
-		 * pscrpc_set_check() which also pushes req's which are
-		 * PSCRPC_RQ_PHASE_NEW.
-		 */
-		freelock(&req->rq_lock);
-		DEBUG_REQ(PLL_DIAG, req, buf, "req already inflight");
-		return (0);
-	}
+
+	/*
+	 * This is OK; it means that another thread has done a
+	 * pscrpc_set_check() which also pushes req's which are
+	 * PSCRPC_RQ_PHASE_NEW.
+	 */
+	freelock(&req->rq_lock);
+	DEBUG_REQ(PLL_DIAG, req, buf, "req already inflight");
+	return (0);
 }
 
 static int
