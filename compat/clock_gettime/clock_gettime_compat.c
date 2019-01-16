@@ -4,10 +4,8 @@
 int
 main(int argc, char *argv[])
 {
-	void *p;
-
 	(void)argc;
 	(void)argv;
-	p = clock_gettime;
+	(void)clock_gettime;
 	exit(0);
 }

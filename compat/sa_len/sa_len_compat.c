@@ -1,6 +1,7 @@
 #include <sys/socket.h>
 
 #include <stdlib.h>
+#include <string.h>
 
 int
 main(int argc, char *argv[])
@@ -9,6 +10,7 @@ main(int argc, char *argv[])
 
 	(void)argc;
 	(void)argv;
-	sa.sa_len = 0;
+	memset(&sa, 0, sizeof(sa));
+	(void)sa.sa_len;
 	exit(0);
 }

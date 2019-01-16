@@ -4,10 +4,8 @@
 int
 main(int argc, char *argv[])
 {
-	const void *p;
-
 	(void)argc;
 	(void)argv;
-	p = setproctitle;
+	(void)setproctitle;
 	exit(0);
 }

@@ -4,10 +4,8 @@
 int
 main(int argc, char *argv[])
 {
-	void *p;
-
 	(void)argc;
 	(void)argv;
-	p = numa_bitmask_free;
+	(void)numa_bitmask_free;
 	exit(0);
 }

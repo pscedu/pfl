@@ -6,10 +6,8 @@
 int
 main(int argc, char *argv[])
 {
-	int n;
-
 	(void)argc;
 	(void)argv;
-	n = DKIOCEJECT;
+	(void)DKIOCEJECT; 
 	exit(0);
 }

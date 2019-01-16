@@ -7,3 +7,5 @@ PROG=		yyerrlab_compat
 SRCS+=		yyerrlab_compat.y
 
 include ${MAINMK}
+
+PCPP_FLAGS=	-F

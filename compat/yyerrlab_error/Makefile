@@ -8,3 +8,5 @@ SRCS+=		../yyerrlab/yyerrlab_compat.y
 CFLAGS+=	-Werror
 
 include ${MAINMK}
+
+PCPP_FLAGS=	-F

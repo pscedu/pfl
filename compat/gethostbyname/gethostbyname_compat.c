@@ -4,10 +4,8 @@
 int
 main(int argc, char *argv[])
 {
-	void *p;
-
 	(void)argc;
 	(void)argv;
-	p = gethostbyname;
+	(void)gethostbyname; 
 	exit(0);
 }

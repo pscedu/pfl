@@ -6,10 +6,8 @@ extern const char * const sys_sigabbrev[];
 int
 main(int argc, char *argv[])
 {
-	const void *p;
-
 	(void)argc;
 	(void)argv;
-	p = sys_sigabbrev;
+	(void)sys_sigabbrev;
 	exit(0);
 }

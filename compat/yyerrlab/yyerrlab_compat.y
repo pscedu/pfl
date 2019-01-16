@@ -11,7 +11,6 @@
 
 void		 yyerror(const char *, ...);
 int		 yylex(void);
-int		 yyparse(void);
 %}
 
 %start config

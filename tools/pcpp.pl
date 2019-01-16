@@ -27,7 +27,7 @@ use PFL::Getoptv;
 use File::Basename;
 
 sub usage {
-	warn "usage: $0 [-fx] [-H hack] file\n";
+	warn "usage: $0 [-FRT] [-H hack] file\n";
 	exit 1;
 }
 
@@ -43,7 +43,7 @@ my %hacks = (
 	yytext		=> 0,
 );
 my %opts;
-getoptv("fH:RT", \%opts) or usage;
+getoptv("FH:RT", \%opts) or usage;
 usage unless @ARGV == 1;
 
 if ($opts{H}) {
@@ -59,6 +59,11 @@ open F, "<", $fn or die "$fn: $!\n";
 local $/;
 my $data = <F>;
 close F;
+
+if ($opts{F}) {
+	print $data;
+	exit;
+}
 
 my $output = "";
 

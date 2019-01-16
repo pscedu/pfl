@@ -9,13 +9,21 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "pfl/log.h"
+
 void		 yyerror(const char *, ...);
 int		 yylex(void);
-int		 yyparse(void);
 
+#undef psclog_trace
 #define psclog_trace(fmt, ...)
+
+#undef PFL_RETURNX
 #define PFL_RETURNX()		return
+
+#undef PFL_RETURN
 #define PFL_RETURN(rc)		return (rc)
+
+#undef PFL_RETURN_LIT
 #define PFL_RETURN_LIT(s)	return (s)
 %}
 

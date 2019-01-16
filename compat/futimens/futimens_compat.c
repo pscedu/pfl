@@ -7,10 +7,8 @@
 int
 main(int argc, char *argv[])
 {
-	void *p;
-
 	(void)argc;
 	(void)argv;
-	p = futimens;
+	(void)futimens; 
 	exit(0);
 }

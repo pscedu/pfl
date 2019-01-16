@@ -4,10 +4,8 @@
 int
 main(int argc, char *argv[])
 {
-	void *p;
-
 	(void)argc;
 	(void)argv;
-	p = strvis;
+	(void)strvis;
 	exit(0);
 }

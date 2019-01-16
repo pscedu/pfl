@@ -3,10 +3,8 @@
 int
 main(int argc, char *argv[])
 {
-	void *p;
-
 	(void)argc;
 	(void)argv;
-	p = qsort_r;
+	(void)qsort_r;
 	exit(0);
 }
