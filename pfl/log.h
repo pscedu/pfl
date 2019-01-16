@@ -58,7 +58,7 @@ struct psc_thread;
 #define PLL_MAX		(-1)		/* force log (for temporary debugging) */
 
 /* Logging options. */
-#define PLO_ERRNO	(1 << 0)	/* strerror(errno) */
+#define PLO_ERRNO	(1 << 0)	/* append strerror(errno) to message */
 
 /*
  * The macros here avoid a call frame and argument evaluation by only
@@ -83,7 +83,8 @@ struct psc_thread;
 	} while (0)
 
 #define _psclogk(ss, lvl, flg, fmt, ...)				\
-	_psclog_pci(PFL_CALLERINFOSS(ss), (lvl), (flg), (fmt), ## __VA_ARGS__)
+	_psclog_pci(PFL_CALLERINFOSS(ss), (lvl), (flg), (fmt), 		\
+	    ## __VA_ARGS__)
 
 #define _psclogvk(ss, lvl, flg, fmt, ap)				\
 	_psclogv_pci(PFL_CALLERINFOSS(ss), (lvl), (flg), (fmt), (ap))
@@ -257,6 +258,12 @@ struct pfl_logpoint {
 	do {								\
 		psclog_trace("exit %s", __func__);			\
 		return;							\
+	} while (0)
+
+#define PFL_RETURN_AGGR(rv)						\
+	do {								\
+		psclog_trace("exit %s", __func__);			\
+		return (rv);						\
 	} while (0)
 
 #define PFL_RETURN(rv)							\
