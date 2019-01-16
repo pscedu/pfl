@@ -64,8 +64,9 @@ display(struct psc_dynarray *da)
 
 #define CHECK(d, ...)	_check(PFL_CALLERINFO(), (d), ##__VA_ARGS__)
 
+#define _pfl_callerinfo pci
 void
-_check(PFL_CALLERINFO_ARG, struct psc_dynarray *da, ...)
+_check(const struct pfl_callerinfo *pci, struct psc_dynarray *da, ...)
 {
 	void *p, *t, *checkp;
 	va_list ap, c;
@@ -92,6 +93,7 @@ _check(PFL_CALLERINFO_ARG, struct psc_dynarray *da, ...)
 	va_end(ap);
 	pfl_assert(va_arg(ap, void *) == NULL);
 }
+#undef _pfl_callerinfo
 
 int
 cmp(const void *a, const void *b)

@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "pfl/log.h"
 #include "pfl/pthrutil.h"
 #include "pfl/thread.h"
 #include "pfl/time.h"
@@ -85,7 +86,7 @@ psc_mutex_destroy(struct pfl_mutex *mut)
 }
 
 void
-_psc_mutex_lock(PFL_CALLERINFO_ARG, struct pfl_mutex *mut)
+_psc_mutex_lock(const struct pfl_callerinfo *pci, struct pfl_mutex *mut)
 {
 	int rc;
 
@@ -97,13 +98,13 @@ _psc_mutex_lock(PFL_CALLERINFO_ARG, struct pfl_mutex *mut)
 	if (rc)
 		psc_fatalx("pthread_mutex_lock: %s", strerror(rc));
 	mut->pm_owner = pthread_self();
-	mut->pm_lineno = _pfl_callerinfo ? _pfl_callerinfo->pci_lineno :
-	    __LINE__;
+	mut->pm_lineno = pci ? pci->pci_lineno : __LINE__;
 	PMUT_LOG(mut, "acquired");
 }
 
 void
-_psc_mutex_unlock(PFL_CALLERINFO_ARG, struct pfl_mutex *mut)
+_psc_mutex_unlock(const struct pfl_callerinfo *pci,
+    struct pfl_mutex *mut)
 {
 	int rc, dolog = 0, loglevel = PLL_VDEBUG;
 
@@ -122,7 +123,8 @@ _psc_mutex_unlock(PFL_CALLERINFO_ARG, struct pfl_mutex *mut)
 }
 
 int
-_psc_mutex_reqlock(PFL_CALLERINFO_ARG, struct pfl_mutex *mut)
+_psc_mutex_reqlock(const struct pfl_callerinfo *pci,
+    struct pfl_mutex *mut)
 {
 	int rc;
 
@@ -137,15 +139,16 @@ _psc_mutex_reqlock(PFL_CALLERINFO_ARG, struct pfl_mutex *mut)
 }
 
 void
-_psc_mutex_ureqlock(PFL_CALLERINFO_ARG, struct pfl_mutex *mut,
-    int waslocked)
+_psc_mutex_ureqlock(const struct pfl_callerinfo *pci,
+    struct pfl_mutex *mut, int waslocked)
 {
 	if (!waslocked)
 		psc_mutex_unlock(mut);
 }
 
 int
-_psc_mutex_trylock(PFL_CALLERINFO_ARG, struct pfl_mutex *mut)
+_psc_mutex_trylock(const struct pfl_callerinfo *pci,
+    struct pfl_mutex *mut)
 {
 	int rc;
 
@@ -168,8 +171,8 @@ psc_mutex_haslock(struct pfl_mutex *mut)
 }
 
 int
-_psc_mutex_tryreqlock(PFL_CALLERINFO_ARG, struct pfl_mutex *mut,
-    int *waslocked)
+_psc_mutex_tryreqlock(const struct pfl_callerinfo *pci,
+    struct pfl_mutex *mut, int *waslocked)
 {
 	if (psc_mutex_haslock(mut)) {
 		*waslocked = 1;
@@ -180,7 +183,8 @@ _psc_mutex_tryreqlock(PFL_CALLERINFO_ARG, struct pfl_mutex *mut,
 }
 
 void
-_psc_mutex_ensure_locked(PFL_CALLERINFO_ARG, struct pfl_mutex *m)
+_psc_mutex_ensure_locked(const struct pfl_callerinfo *pci,
+    struct pfl_mutex *m)
 {
 	pfl_assert(psc_mutex_haslock(m));
 }
@@ -210,7 +214,8 @@ pfl_rwlock_destroy(struct pfl_rwlock *rw)
 }
 
 void
-_pfl_rwlock_rdlock(PFL_CALLERINFO_ARG, struct pfl_rwlock *rw)
+_pfl_rwlock_rdlock(const struct pfl_callerinfo *pci,
+    struct pfl_rwlock *rw)
 {
 	pthread_t p;
 	void *pa;
@@ -232,7 +237,8 @@ _pfl_rwlock_rdlock(PFL_CALLERINFO_ARG, struct pfl_rwlock *rw)
 }
 
 void
-_pfl_rwlock_wrlock(PFL_CALLERINFO_ARG, struct pfl_rwlock *rw)
+_pfl_rwlock_wrlock(const struct pfl_callerinfo *pci,
+    struct pfl_rwlock *rw)
 {
 	pthread_t p;
 	int rc;
@@ -274,7 +280,8 @@ pfl_rwlock_haswrlock(struct pfl_rwlock *rw)
 }
 
 int
-_pfl_rwlock_reqrdlock(PFL_CALLERINFO_ARG, struct pfl_rwlock *rw)
+_pfl_rwlock_reqrdlock(const struct pfl_callerinfo *pci,
+    struct pfl_rwlock *rw)
 {
 	if (pfl_rwlock_hasrdlock(rw))
 		return (1);
@@ -283,7 +290,8 @@ _pfl_rwlock_reqrdlock(PFL_CALLERINFO_ARG, struct pfl_rwlock *rw)
 }
 
 int
-_pfl_rwlock_reqwrlock(PFL_CALLERINFO_ARG, struct pfl_rwlock *rw)
+_pfl_rwlock_reqwrlock(const struct pfl_callerinfo *pci,
+    struct pfl_rwlock *rw)
 {
 	if (pfl_rwlock_haswrlock(rw))
 		return (1);
@@ -292,15 +300,16 @@ _pfl_rwlock_reqwrlock(PFL_CALLERINFO_ARG, struct pfl_rwlock *rw)
 }
 
 void
-_pfl_rwlock_ureqlock(PFL_CALLERINFO_ARG, struct pfl_rwlock *rw,
-    int waslocked)
+_pfl_rwlock_ureqlock(const struct pfl_callerinfo *pci,
+    struct pfl_rwlock *rw, int waslocked)
 {
 	if (!waslocked)
 		pfl_rwlock_unlock(rw);
 }
 
 void
-_pfl_rwlock_unlock(PFL_CALLERINFO_ARG, struct pfl_rwlock *rw)
+_pfl_rwlock_unlock(const struct pfl_callerinfo *pci,
+    struct pfl_rwlock *rw)
 {
 	int rc, wr = 0;
 	pthread_t p;

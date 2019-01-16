@@ -36,8 +36,8 @@
 #include "pfl/lockedlist.h"
 #include "pfl/log.h"
 #include "pfl/mlist.h"
-#include "pfl/opstats.h"
 #include "pfl/multiwait.h"
+#include "pfl/opstats.h"
 
 struct psc_lockedlist pfl_mlists =
     PLL_INIT(&pfl_mlists, struct pfl_mlist, pml_lentry);
@@ -47,9 +47,10 @@ struct psc_lockedlist pfl_mlists =
  * @pml: the mlist to access.
  * @p: item to return.
  */
+#define _pfl_callerinfo pci
 void
-_pfl_mlist_add(PFL_CALLERINFO_ARG, struct pfl_mlist *pml, void *p,
-    int tail)
+_pfl_mlist_add(const struct pfl_callerinfo *pci, struct pfl_mlist *pml,
+    void *p, int tail)
 {
 	int locked;
 
@@ -62,6 +63,7 @@ _pfl_mlist_add(PFL_CALLERINFO_ARG, struct pfl_mlist *pml, void *p,
 	pfl_multiwaitcond_wakeup(&pml->pml_mwcond_empty);
 	MLIST_URLOCK(pml, locked);
 }
+#undef _pfl_callerinfo
 
 /*
  * Initialize an mlist.

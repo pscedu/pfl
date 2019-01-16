@@ -66,14 +66,8 @@ void	 pfl_init(void);
 void	 pfl_print_flag(const char *, int *);
 void	 pfl_setprocesstitle(char **, const char *, ...);
 
-extern pid_t	  pfl_pid;
-
-#define PFL_CALLERINFO_ARG \
-  _Pragma("GCC diagnostic push") \
-  _Pragma("GCC diagnostic ignored \"-Wshadow\"") \
-  const struct pfl_callerinfo *_pfl_callerinfo \
-  _Pragma("GCC diagnostic pop") \
-
-extern const struct pfl_callerinfo *_pfl_callerinfo;
+extern pid_t	 pfl_pid;
+extern const struct pfl_callerinfo
+		*_pfl_callerinfo;
 
 #endif /* _PFL_PFL_H_ */
